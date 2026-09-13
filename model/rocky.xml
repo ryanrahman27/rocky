@@ -1,0 +1,289 @@
+<mujoco model="rocky">
+  <compiler angle="radian" meshdir="meshes" autolimits="true"/>
+
+  <default>
+    <default class="rocky">
+      <joint damping="0.01" armature="0.00595125" frictionloss="0.05"/>
+      <geom solref="0.01 1"/>
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" group="2" density="0"/>
+      </default>
+      <default class="collision">
+        <geom group="3" contype="1" conaffinity="1" density="0" friction="1 0.005 0.0005"/>
+      </default>
+    </default>
+  </default>
+
+  <asset>
+    <material name="sandstone" rgba="0.588 0.455 0.329 1" specular="0.15" shininess="0.15"/>
+    <material name="sandstone_dark" rgba="0.376 0.290 0.212 1" specular="0.15" shininess="0.15"/>
+    <material name="metal" rgba="0.25 0.25 0.27 1" specular="0.6" shininess="0.5"/>
+    <material name="rubber" rgba="0.12 0.11 0.10 1" specular="0.05" shininess="0.05"/>
+    <mesh name="base__Chassis" file="base__Chassis.stl"/>
+    <mesh name="base__Carapace" file="base__Carapace.stl"/>
+    <mesh name="base__Shoulder_Boot" file="base__Shoulder_Boot.stl"/>
+    <mesh name="base__Shoulder_Boot_1" file="base__Shoulder_Boot_1.stl"/>
+    <mesh name="base__Shoulder_Boot_2" file="base__Shoulder_Boot_2.stl"/>
+    <mesh name="base__Shoulder_Boot_3" file="base__Shoulder_Boot_3.stl"/>
+    <mesh name="base__Shoulder_Boot_4" file="base__Shoulder_Boot_4.stl"/>
+    <mesh name="coxa_l1__Coxa_Bracket" file="coxa_l1__Coxa_Bracket.stl"/>
+    <mesh name="coxa_l1__F6700ZZ_SweepIdler" file="coxa_l1__F6700ZZ_SweepIdler.stl"/>
+    <mesh name="coxa_l1__F6700ZZ_LiftIdler" file="coxa_l1__F6700ZZ_LiftIdler.stl"/>
+    <mesh name="coxa_l1__Shoulder_Cap" file="coxa_l1__Shoulder_Cap.stl"/>
+    <mesh name="femur_l1__Femur_Shell" file="femur_l1__Femur_Shell.stl"/>
+    <mesh name="femur_l1__STS3215_Lift" file="femur_l1__STS3215_Lift.stl"/>
+    <mesh name="femur_l1__STS3215_Elbow" file="femur_l1__STS3215_Elbow.stl"/>
+    <mesh name="femur_l1__Horn_Lift" file="femur_l1__Horn_Lift.stl"/>
+    <mesh name="femur_l1__Horn_Elbow" file="femur_l1__Horn_Elbow.stl"/>
+    <mesh name="femur_l1__Femur_Sleeve_Bottom" file="femur_l1__Femur_Sleeve_Bottom.stl"/>
+    <mesh name="femur_l1__Femur_Sleeve_Top" file="femur_l1__Femur_Sleeve_Top.stl"/>
+    <mesh name="tibia_l1__Tibia" file="tibia_l1__Tibia.stl"/>
+    <mesh name="tibia_l1__F6700ZZ_ElbowIdler" file="tibia_l1__F6700ZZ_ElbowIdler.stl"/>
+    <mesh name="tibia_l1__TactileSwitch_6x6" file="tibia_l1__TactileSwitch_6x6.stl"/>
+    <mesh name="tibia_l1__Tibia_Sleeve_Bottom" file="tibia_l1__Tibia_Sleeve_Bottom.stl"/>
+    <mesh name="tibia_l1__Tibia_Sleeve_Top" file="tibia_l1__Tibia_Sleeve_Top.stl"/>
+    <mesh name="tibia_l1__Knee_Cap" file="tibia_l1__Knee_Cap.stl"/>
+    <mesh name="tibia_l1__Claw_Foot" file="tibia_l1__Claw_Foot.stl"/>
+    <mesh name="tibia_l1__Plunger_Pin" file="tibia_l1__Plunger_Pin.stl"/>
+    <mesh name="tibia_m0__Tibia_Manip" file="tibia_m0__Tibia_Manip.stl"/>
+    <mesh name="tibia_m0__F6700ZZ_ElbowIdler" file="tibia_m0__F6700ZZ_ElbowIdler.stl"/>
+    <mesh name="tibia_m0__STS3215_Wrist" file="tibia_m0__STS3215_Wrist.stl"/>
+    <mesh name="tibia_m0__Horn_Wrist" file="tibia_m0__Horn_Wrist.stl"/>
+    <mesh name="gripper_m0__Gripper_Base" file="gripper_m0__Gripper_Base.stl"/>
+    <mesh name="gripper_m0__Jaw_R" file="gripper_m0__Jaw_R.stl"/>
+    <mesh name="gripper_m0__Jaw_L" file="gripper_m0__Jaw_L.stl"/>
+    <mesh name="gripper_m0__Foot_Pad_Manip" file="gripper_m0__Foot_Pad_Manip.stl"/>
+    <mesh name="gripper_m0__F6700ZZ_WristIdler" file="gripper_m0__F6700ZZ_WristIdler.stl"/>
+    <mesh name="gripper_m0__STS3215_Gripper" file="gripper_m0__STS3215_Gripper.stl"/>
+    <mesh name="gripper_m0__Horn_Gripper" file="gripper_m0__Horn_Gripper.stl"/>
+    <mesh name="gripper_m0__Pinion_12T" file="gripper_m0__Pinion_12T.stl"/>
+    <mesh name="hull_base" file="hull_base.stl"/>
+    <mesh name="hull_coxa" file="hull_coxa.stl"/>
+    <mesh name="hull_femur" file="hull_femur.stl"/>
+    <mesh name="hull_tibia" file="hull_tibia.stl"/>
+    <mesh name="hull_tibia_m" file="hull_tibia_m.stl"/>
+    <mesh name="hull_gripper" file="hull_gripper.stl"/>
+  </asset>
+
+  <worldbody>
+    <body name="base" pos="0 0 0.0450300000" childclass="rocky">
+      <freejoint name="floating_base_joint"/>
+      <inertial pos="0.0001749761 -0.0000434770 0.0527797235" mass="1.3323345375" fullinertia="0.00563132765455 0.00617944523274 0.00885178962494 1.18792858478e-05 6.73435054842e-06 -3.19068712785e-06"/>
+      <site name="imu" pos="0 0 0.0125" size="0.005" group="4"/>
+      <geom class="visual" mesh="base__Chassis" material="sandstone_dark"/>
+      <geom class="visual" mesh="base__Carapace" material="sandstone"/>
+      <geom class="visual" mesh="base__Shoulder_Boot" material="rubber"/>
+      <geom class="visual" mesh="base__Shoulder_Boot_1" material="rubber"/>
+      <geom class="visual" mesh="base__Shoulder_Boot_2" material="rubber"/>
+      <geom class="visual" mesh="base__Shoulder_Boot_3" material="rubber"/>
+      <geom class="visual" mesh="base__Shoulder_Boot_4" material="rubber"/>
+      <geom name="base_collision" class="collision" type="mesh" mesh="hull_base"/>
+
+      <body name="coxa_0" pos="0.1011271243 0.0000000000 0.0220000000" euler="0 0 0.0000000000">
+        <joint name="sweep_0" axis="0 0 1" range="-0.7853981634 0.7853981634" actuatorfrcrange="-2.90 2.90"/>
+        <inertial pos="0.0220536062 -0.0019426100 -0.0017121492" mass="0.0513195740" fullinertia="2.66251964914e-05 2.59360418573e-05 2.73187075064e-05 2.03394448522e-06 -1.75072383268e-06 2.06874025331e-08"/>
+        <geom class="visual" mesh="coxa_l1__Coxa_Bracket" material="sandstone_dark"/>
+        <geom class="visual" mesh="coxa_l1__F6700ZZ_SweepIdler" material="metal"/>
+        <geom class="visual" mesh="coxa_l1__F6700ZZ_LiftIdler" material="metal"/>
+        <geom class="visual" mesh="coxa_l1__Shoulder_Cap" material="sandstone"/>
+        <geom name="coxa_0_collision" class="collision" type="mesh" mesh="hull_coxa"/>
+        <body name="femur_0" pos="0.0420000000 0 0">
+          <joint name="lift_0" axis="0 1 0" range="-1.3962634016 1.4835298642" actuatorfrcrange="-2.90 2.90"/>
+          <inertial pos="0.0641940239 0.0000510935 0.0001382543" mass="0.3104070510" fullinertia="8.81913648521e-05 0.000816480742233 0.000812937154262 6.02727799994e-07 4.02792124591e-07 5.14032825426e-09"/>
+          <geom class="visual" mesh="femur_l1__Femur_Shell" material="sandstone_dark"/>
+          <geom class="visual" mesh="femur_l1__STS3215_Lift" material="metal"/>
+          <geom class="visual" mesh="femur_l1__STS3215_Elbow" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Horn_Lift" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Horn_Elbow" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Femur_Sleeve_Bottom" material="sandstone"/>
+          <geom class="visual" mesh="femur_l1__Femur_Sleeve_Top" material="sandstone"/>
+          <geom name="femur_0_collision" class="collision" type="mesh" mesh="hull_femur"/>
+          <body name="tibia_0" pos="0.1300000000 0 0">
+            <joint name="elbow_0" axis="0 1 0" range="0.1745329252 2.3561944902" actuatorfrcrange="-2.90 2.90"/>
+            <inertial pos="0.0606282784 -0.0006202666 -0.0000000000" mass="0.1149173802" fullinertia="3.21672869662e-05 9.46675013848e-05 0.000110302610086 -6.12120479707e-06 -1.4935611875e-19 -3.66694995021e-20"/>
+            <geom class="visual" mesh="tibia_m0__Tibia_Manip" material="sandstone_dark"/>
+            <geom class="visual" mesh="tibia_m0__F6700ZZ_ElbowIdler" material="metal"/>
+            <geom class="visual" mesh="tibia_m0__STS3215_Wrist" material="metal"/>
+            <geom class="visual" mesh="tibia_m0__Horn_Wrist" material="metal"/>
+            <geom name="tibia_0_collision" class="collision" type="mesh" mesh="hull_tibia_m"/>
+            <body name="gripper_0" pos="0.0900000000 0 0">
+              <joint name="wrist_0" axis="0 1 0" range="-1.3089969390 1.3089969390" actuatorfrcrange="-2.90 2.90"/>
+              <inertial pos="0.0351404471 -0.0001979038 0.0000000000" mass="0.1331457011" fullinertia="4.66083182644e-05 6.91403871936e-05 6.28312573096e-05 -5.00611665605e-06 -2.23750063156e-15 -8.47360828886e-09"/>
+              <geom class="visual" mesh="gripper_m0__Gripper_Base" material="sandstone_dark"/>
+              <geom class="visual" mesh="gripper_m0__Jaw_R" material="sandstone_dark"/>
+              <geom class="visual" mesh="gripper_m0__Jaw_L" material="sandstone_dark"/>
+              <geom class="visual" mesh="gripper_m0__Foot_Pad_Manip" material="rubber"/>
+              <geom class="visual" mesh="gripper_m0__F6700ZZ_WristIdler" material="metal"/>
+              <geom class="visual" mesh="gripper_m0__STS3215_Gripper" material="metal"/>
+              <geom class="visual" mesh="gripper_m0__Horn_Gripper" material="metal"/>
+              <geom class="visual" mesh="gripper_m0__Pinion_12T" material="metal"/>
+              <geom name="gripper_0_collision" class="collision" type="mesh" mesh="hull_gripper"/>
+              <site name="foot_0" pos="0.0743601445 0 0" size="0.0100000000" group="4"/>
+              <geom name="foot_0_collision" class="collision" type="sphere" size="0.0100000000" pos="0.0743601445 0 0" condim="6" priority="1"/>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <body name="coxa_1" pos="0.0312500000 0.0961776105 0.0220000000" euler="0 0 1.2566370614">
+        <joint name="sweep_1" axis="0 0 1" range="-0.7853981634 0.7853981634" actuatorfrcrange="-2.90 2.90"/>
+        <inertial pos="0.0220536062 -0.0019426100 -0.0017121492" mass="0.0513195740" fullinertia="2.66251964914e-05 2.59360418573e-05 2.73187075064e-05 2.03394448522e-06 -1.75072383268e-06 2.06874025331e-08"/>
+        <geom class="visual" mesh="coxa_l1__Coxa_Bracket" material="sandstone_dark"/>
+        <geom class="visual" mesh="coxa_l1__F6700ZZ_SweepIdler" material="metal"/>
+        <geom class="visual" mesh="coxa_l1__F6700ZZ_LiftIdler" material="metal"/>
+        <geom class="visual" mesh="coxa_l1__Shoulder_Cap" material="sandstone"/>
+        <geom name="coxa_1_collision" class="collision" type="mesh" mesh="hull_coxa"/>
+        <body name="femur_1" pos="0.0420000000 0 0">
+          <joint name="lift_1" axis="0 1 0" range="-1.3962634016 1.4835298642" actuatorfrcrange="-2.90 2.90"/>
+          <inertial pos="0.0641940239 0.0000510935 0.0001382543" mass="0.3104070510" fullinertia="8.81913648521e-05 0.000816480742233 0.000812937154262 6.02727799994e-07 4.02792124591e-07 5.14032825426e-09"/>
+          <geom class="visual" mesh="femur_l1__Femur_Shell" material="sandstone_dark"/>
+          <geom class="visual" mesh="femur_l1__STS3215_Lift" material="metal"/>
+          <geom class="visual" mesh="femur_l1__STS3215_Elbow" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Horn_Lift" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Horn_Elbow" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Femur_Sleeve_Bottom" material="sandstone"/>
+          <geom class="visual" mesh="femur_l1__Femur_Sleeve_Top" material="sandstone"/>
+          <geom name="femur_1_collision" class="collision" type="mesh" mesh="hull_femur"/>
+          <body name="tibia_1" pos="0.1300000000 0 0">
+            <joint name="elbow_1" axis="0 1 0" range="0.1745329252 2.2689280276" actuatorfrcrange="-2.90 2.90"/>
+            <inertial pos="0.0794509441 -0.0005404937 -0.0000268868" mass="0.1952924260" fullinertia="7.16375396603e-05 0.000446757714147 0.00047516971597 -6.30207363729e-06 -3.81130343208e-09 -3.34732118895e-08"/>
+            <geom class="visual" mesh="tibia_l1__Tibia" material="sandstone_dark"/>
+            <geom class="visual" mesh="tibia_l1__F6700ZZ_ElbowIdler" material="metal"/>
+            <geom class="visual" mesh="tibia_l1__TactileSwitch_6x6" material="metal"/>
+            <geom class="visual" mesh="tibia_l1__Tibia_Sleeve_Bottom" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Tibia_Sleeve_Top" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Knee_Cap" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Claw_Foot" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Plunger_Pin" material="rubber"/>
+            <geom name="tibia_1_collision" class="collision" type="mesh" mesh="hull_tibia"/>
+            <site name="foot_1" pos="0.1622572343 0 0" size="0.0120000000" group="4"/>
+            <geom name="foot_1_collision" class="collision" type="sphere" size="0.0120000000" pos="0.1622572343 0 0" condim="6" priority="1"/>
+          </body>
+        </body>
+      </body>
+
+      <body name="coxa_2" pos="-0.0818135621 0.0594410323 0.0220000000" euler="0 0 2.5132741229">
+        <joint name="sweep_2" axis="0 0 1" range="-0.7853981634 0.7853981634" actuatorfrcrange="-2.90 2.90"/>
+        <inertial pos="0.0220536062 -0.0019426100 -0.0017121492" mass="0.0513195740" fullinertia="2.66251964914e-05 2.59360418573e-05 2.73187075064e-05 2.03394448522e-06 -1.75072383268e-06 2.06874025331e-08"/>
+        <geom class="visual" mesh="coxa_l1__Coxa_Bracket" material="sandstone_dark"/>
+        <geom class="visual" mesh="coxa_l1__F6700ZZ_SweepIdler" material="metal"/>
+        <geom class="visual" mesh="coxa_l1__F6700ZZ_LiftIdler" material="metal"/>
+        <geom class="visual" mesh="coxa_l1__Shoulder_Cap" material="sandstone"/>
+        <geom name="coxa_2_collision" class="collision" type="mesh" mesh="hull_coxa"/>
+        <body name="femur_2" pos="0.0420000000 0 0">
+          <joint name="lift_2" axis="0 1 0" range="-1.3962634016 1.4835298642" actuatorfrcrange="-2.90 2.90"/>
+          <inertial pos="0.0641940239 0.0000510935 0.0001382543" mass="0.3104070510" fullinertia="8.81913648521e-05 0.000816480742233 0.000812937154262 6.02727799994e-07 4.02792124591e-07 5.14032825426e-09"/>
+          <geom class="visual" mesh="femur_l1__Femur_Shell" material="sandstone_dark"/>
+          <geom class="visual" mesh="femur_l1__STS3215_Lift" material="metal"/>
+          <geom class="visual" mesh="femur_l1__STS3215_Elbow" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Horn_Lift" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Horn_Elbow" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Femur_Sleeve_Bottom" material="sandstone"/>
+          <geom class="visual" mesh="femur_l1__Femur_Sleeve_Top" material="sandstone"/>
+          <geom name="femur_2_collision" class="collision" type="mesh" mesh="hull_femur"/>
+          <body name="tibia_2" pos="0.1300000000 0 0">
+            <joint name="elbow_2" axis="0 1 0" range="0.1745329252 2.2689280276" actuatorfrcrange="-2.90 2.90"/>
+            <inertial pos="0.0794509441 -0.0005404937 -0.0000268868" mass="0.1952924260" fullinertia="7.16375396603e-05 0.000446757714147 0.00047516971597 -6.30207363729e-06 -3.81130343208e-09 -3.34732118895e-08"/>
+            <geom class="visual" mesh="tibia_l1__Tibia" material="sandstone_dark"/>
+            <geom class="visual" mesh="tibia_l1__F6700ZZ_ElbowIdler" material="metal"/>
+            <geom class="visual" mesh="tibia_l1__TactileSwitch_6x6" material="metal"/>
+            <geom class="visual" mesh="tibia_l1__Tibia_Sleeve_Bottom" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Tibia_Sleeve_Top" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Knee_Cap" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Claw_Foot" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Plunger_Pin" material="rubber"/>
+            <geom name="tibia_2_collision" class="collision" type="mesh" mesh="hull_tibia"/>
+            <site name="foot_2" pos="0.1622572343 0 0" size="0.0120000000" group="4"/>
+            <geom name="foot_2_collision" class="collision" type="sphere" size="0.0120000000" pos="0.1622572343 0 0" condim="6" priority="1"/>
+          </body>
+        </body>
+      </body>
+
+      <body name="coxa_3" pos="-0.0818135621 -0.0594410323 0.0220000000" euler="0 0 -2.5132741229">
+        <joint name="sweep_3" axis="0 0 1" range="-0.7853981634 0.7853981634" actuatorfrcrange="-2.90 2.90"/>
+        <inertial pos="0.0220536062 -0.0019426100 -0.0017121492" mass="0.0513195740" fullinertia="2.66251964914e-05 2.59360418573e-05 2.73187075064e-05 2.03394448522e-06 -1.75072383268e-06 2.06874025331e-08"/>
+        <geom class="visual" mesh="coxa_l1__Coxa_Bracket" material="sandstone_dark"/>
+        <geom class="visual" mesh="coxa_l1__F6700ZZ_SweepIdler" material="metal"/>
+        <geom class="visual" mesh="coxa_l1__F6700ZZ_LiftIdler" material="metal"/>
+        <geom class="visual" mesh="coxa_l1__Shoulder_Cap" material="sandstone"/>
+        <geom name="coxa_3_collision" class="collision" type="mesh" mesh="hull_coxa"/>
+        <body name="femur_3" pos="0.0420000000 0 0">
+          <joint name="lift_3" axis="0 1 0" range="-1.3962634016 1.4835298642" actuatorfrcrange="-2.90 2.90"/>
+          <inertial pos="0.0641940239 0.0000510935 0.0001382543" mass="0.3104070510" fullinertia="8.81913648521e-05 0.000816480742233 0.000812937154262 6.02727799994e-07 4.02792124591e-07 5.14032825426e-09"/>
+          <geom class="visual" mesh="femur_l1__Femur_Shell" material="sandstone_dark"/>
+          <geom class="visual" mesh="femur_l1__STS3215_Lift" material="metal"/>
+          <geom class="visual" mesh="femur_l1__STS3215_Elbow" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Horn_Lift" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Horn_Elbow" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Femur_Sleeve_Bottom" material="sandstone"/>
+          <geom class="visual" mesh="femur_l1__Femur_Sleeve_Top" material="sandstone"/>
+          <geom name="femur_3_collision" class="collision" type="mesh" mesh="hull_femur"/>
+          <body name="tibia_3" pos="0.1300000000 0 0">
+            <joint name="elbow_3" axis="0 1 0" range="0.1745329252 2.2689280276" actuatorfrcrange="-2.90 2.90"/>
+            <inertial pos="0.0794509441 -0.0005404937 -0.0000268868" mass="0.1952924260" fullinertia="7.16375396603e-05 0.000446757714147 0.00047516971597 -6.30207363729e-06 -3.81130343208e-09 -3.34732118895e-08"/>
+            <geom class="visual" mesh="tibia_l1__Tibia" material="sandstone_dark"/>
+            <geom class="visual" mesh="tibia_l1__F6700ZZ_ElbowIdler" material="metal"/>
+            <geom class="visual" mesh="tibia_l1__TactileSwitch_6x6" material="metal"/>
+            <geom class="visual" mesh="tibia_l1__Tibia_Sleeve_Bottom" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Tibia_Sleeve_Top" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Knee_Cap" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Claw_Foot" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Plunger_Pin" material="rubber"/>
+            <geom name="tibia_3_collision" class="collision" type="mesh" mesh="hull_tibia"/>
+            <site name="foot_3" pos="0.1622572343 0 0" size="0.0120000000" group="4"/>
+            <geom name="foot_3_collision" class="collision" type="sphere" size="0.0120000000" pos="0.1622572343 0 0" condim="6" priority="1"/>
+          </body>
+        </body>
+      </body>
+
+      <body name="coxa_4" pos="0.0312500000 -0.0961776105 0.0220000000" euler="0 0 -1.2566370614">
+        <joint name="sweep_4" axis="0 0 1" range="-0.7853981634 0.7853981634" actuatorfrcrange="-2.90 2.90"/>
+        <inertial pos="0.0220536062 -0.0019426100 -0.0017121492" mass="0.0513195740" fullinertia="2.66251964914e-05 2.59360418573e-05 2.73187075064e-05 2.03394448522e-06 -1.75072383268e-06 2.06874025331e-08"/>
+        <geom class="visual" mesh="coxa_l1__Coxa_Bracket" material="sandstone_dark"/>
+        <geom class="visual" mesh="coxa_l1__F6700ZZ_SweepIdler" material="metal"/>
+        <geom class="visual" mesh="coxa_l1__F6700ZZ_LiftIdler" material="metal"/>
+        <geom class="visual" mesh="coxa_l1__Shoulder_Cap" material="sandstone"/>
+        <geom name="coxa_4_collision" class="collision" type="mesh" mesh="hull_coxa"/>
+        <body name="femur_4" pos="0.0420000000 0 0">
+          <joint name="lift_4" axis="0 1 0" range="-1.3962634016 1.4835298642" actuatorfrcrange="-2.90 2.90"/>
+          <inertial pos="0.0641940239 0.0000510935 0.0001382543" mass="0.3104070510" fullinertia="8.81913648521e-05 0.000816480742233 0.000812937154262 6.02727799994e-07 4.02792124591e-07 5.14032825426e-09"/>
+          <geom class="visual" mesh="femur_l1__Femur_Shell" material="sandstone_dark"/>
+          <geom class="visual" mesh="femur_l1__STS3215_Lift" material="metal"/>
+          <geom class="visual" mesh="femur_l1__STS3215_Elbow" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Horn_Lift" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Horn_Elbow" material="metal"/>
+          <geom class="visual" mesh="femur_l1__Femur_Sleeve_Bottom" material="sandstone"/>
+          <geom class="visual" mesh="femur_l1__Femur_Sleeve_Top" material="sandstone"/>
+          <geom name="femur_4_collision" class="collision" type="mesh" mesh="hull_femur"/>
+          <body name="tibia_4" pos="0.1300000000 0 0">
+            <joint name="elbow_4" axis="0 1 0" range="0.1745329252 2.2689280276" actuatorfrcrange="-2.90 2.90"/>
+            <inertial pos="0.0794509441 -0.0005404937 -0.0000268868" mass="0.1952924260" fullinertia="7.16375396603e-05 0.000446757714147 0.00047516971597 -6.30207363729e-06 -3.81130343208e-09 -3.34732118895e-08"/>
+            <geom class="visual" mesh="tibia_l1__Tibia" material="sandstone_dark"/>
+            <geom class="visual" mesh="tibia_l1__F6700ZZ_ElbowIdler" material="metal"/>
+            <geom class="visual" mesh="tibia_l1__TactileSwitch_6x6" material="metal"/>
+            <geom class="visual" mesh="tibia_l1__Tibia_Sleeve_Bottom" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Tibia_Sleeve_Top" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Knee_Cap" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Claw_Foot" material="sandstone"/>
+            <geom class="visual" mesh="tibia_l1__Plunger_Pin" material="rubber"/>
+            <geom name="tibia_4_collision" class="collision" type="mesh" mesh="hull_tibia"/>
+            <site name="foot_4" pos="0.1622572343 0 0" size="0.0120000000" group="4"/>
+            <geom name="foot_4_collision" class="collision" type="sphere" size="0.0120000000" pos="0.1622572343 0 0" condim="6" priority="1"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <sensor>
+    <gyro name="imu_ang_vel" site="imu"/>
+    <velocimeter name="imu_lin_vel" site="imu"/>
+    <accelerometer name="imu_lin_acc" site="imu"/>
+    <framezaxis name="imu_upvector" objtype="body" objname="world" reftype="site" refname="imu"/>
+    <subtreeangmom name="root_angmom" body="base"/>
+  </sensor>
+
+  <keyframe>
+    <key name="home" qpos="0 0 0.0450300000 1 0 0 0 0.0000000000 -0.8726646260 2.1293016874 0.0000000000 0.0000000000 -0.8726646260 2.1293016874 0.0000000000 -0.8726646260 2.1293016874 0.0000000000 -0.8726646260 2.1293016874 0.0000000000 -0.8726646260 2.1293016874"/>
+  </keyframe>
+</mujoco>
