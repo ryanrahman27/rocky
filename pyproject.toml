@@ -1,0 +1,33 @@
+[build-system]
+requires = ["uv_build>=0.8.18,<0.9.0"]
+build-backend = "uv_build"
+
+[project]
+name = "rocky"
+version = "0.1.0"
+description = "Rocky: a five-legged robot -- CAD-derived sim model, wave gait, and PPO locomotion in mjlab"
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+dependencies = [
+  "mjlab>=1.6.0",
+  "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+# Everything the scripted gait and the model checks need, without mjlab's
+# CUDA-only stack. `uv sync --extra gait` is enough to run scripts/play_gait.py
+# on a laptop.
+gait = ["mujoco>=3.11", "imageio>=2.31"]
+dev = ["pytest>=7.4", "trimesh>=4.0"]
+
+# How mjlab discovers the tasks. The [build-system] table above is required for
+# this to be registered.
+[project.entry-points."mjlab.tasks"]
+rocky = "rocky.tasks"
+
+[tool.uv.build-backend]
+module-root = "src"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

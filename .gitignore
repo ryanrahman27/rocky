@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+uv.lock
+logs/
+outputs/
+wandb/
+*.mp4
+*.gif
+!docs/*.gif
+.DS_Store
