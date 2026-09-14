@@ -112,9 +112,14 @@ def rocky_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     cfg.observations["critic"].terms["gait_clock"] = clock
 
     # --- gait shaping -------------------------------------------------------
+    # Weight 2.5 puts the schedule on a par with velocity tracking (2.0 + 2.0).
+    # At 1.0 a policy that tracks velocity with a shuffle scores ~93% of the
+    # velocity reward and ~75% of this one, and has no reason to restructure its
+    # gait; the last quarter of the gait reward has to be worth more than the
+    # velocity tracking it costs to reorganise.
     cfg.rewards["gait_contact"] = RewardTermCfg(
         func=gait_mdp.gait_contact_schedule,
-        weight=1.0,
+        weight=2.5,
         params={
             "sensor_name": feet_ground_cfg.name,
             "command_name": "twist",
@@ -125,7 +130,7 @@ def rocky_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     )
     cfg.rewards["gait_swing_height"] = RewardTermCfg(
         func=gait_mdp.gait_swing_clearance,
-        weight=-5.0,
+        weight=-1.5,
         params={
             "height_sensor_name": "foot_height_scan",
             "command_name": "twist",

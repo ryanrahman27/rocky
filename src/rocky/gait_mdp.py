@@ -158,9 +158,15 @@ def gait_swing_clearance(
     act = _activity(env, command_name, command_threshold)[:, None]
 
     target = foot_radius + act * swinging * step_height * torch.sin(torch.pi * s)
-    cost = torch.sum(torch.square(heights - target) * swinging, dim=1)
+    err = heights - target
 
+    # Normalised by step height: a foot a full step-height off target costs 1.0
+    # per foot. In metres-squared the numbers are ~1e-4 and the term silently
+    # does nothing whatever weight you give it.
+    cost = torch.sum(torch.square(err / step_height) * swinging, dim=1)
+
+    n_swing = torch.clamp(swinging.sum(dim=1), min=1.0)
     env.extras["log"]["Metrics/swing_height_err"] = torch.sqrt(
-        torch.clamp((cost / torch.clamp(swinging.sum(dim=1), min=1.0)).mean(), min=0.0)
+        torch.clamp((torch.sum(torch.square(err) * swinging, dim=1) / n_swing).mean(), min=0.0)
     )
     return cost
