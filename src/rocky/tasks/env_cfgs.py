@@ -45,6 +45,9 @@ MAX_FWD = 0.08
 MAX_LAT = 0.04
 MAX_YAW = 0.3
 
+#: Below this combined |v| + |w| a command counts as "stand still".
+CMD_DEADBAND = 0.012
+
 
 def rocky_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     """Rocky velocity tracking on generated rough terrain."""
@@ -183,6 +186,54 @@ def rocky_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     twist.ranges.lin_vel_x = (-MAX_FWD * 0.6, MAX_FWD)
     twist.ranges.lin_vel_y = (-MAX_LAT, MAX_LAT)
     twist.ranges.ang_vel_z = (-MAX_YAW, MAX_YAW)
+
+    # mjlab's velocity task is tuned for quadrupeds that cruise at 1-3 m/s, and
+    # several of its numbers are in velocity units. Rocky tops out at 0.08 m/s,
+    # so left alone they mean something entirely different here:
+    #
+    #   rel_forward_envs  20% of envs get lin_vel_x forced to clamp(min=0.3),
+    #                     hardcoded in the command term -- 4x Rocky's top speed,
+    #                     unreachable no matter what ranges say. Turned off; the
+    #                     sampled range already covers straight-line walking.
+    #   command_threshold the "is it being asked to move?" gate on the foot and
+    #                     landing rewards. At 0.05 it sits inside Rocky's command
+    #                     range, so those rewards would switch on and off mid-range.
+    #   walking_threshold the posture reward's standing/walking switch. At 0.05
+    #                     Rocky counts as standing while walking, and the tight
+    #                     standing posture std then fights the gait.
+    #
+    # CMD_DEADBAND just has to separate "commanded to stand" (exactly zero) from
+    # "commanded to move" (anything Rocky can actually do).
+    twist.rel_forward_envs = 0.0
+    for term, key in (
+        ("pose", "walking_threshold"),
+        ("foot_clearance", "command_threshold"),
+        ("foot_swing_height", "command_threshold"),
+        ("foot_slip", "command_threshold"),
+        ("soft_landing", "command_threshold"),
+        ("air_time", "command_threshold"),
+    ):
+        if term in cfg.rewards and key in cfg.rewards[term].params:
+            cfg.rewards[term].params[key] = CMD_DEADBAND
+    cfg.rewards["pose"].params["running_threshold"] = MAX_FWD + MAX_YAW
+
+    # The stock command curriculum is quadruped-sized: its first stage overwrites
+    # lin_vel_x with (-1.0, 1.0) at step 0 and later ramps to 3 m/s -- ~13x what
+    # Rocky can do. Training against commands the robot cannot reach produces
+    # flailing rather than a gait. "step" counts policy steps, so these are
+    # independent of num_envs and num_steps_per_env.
+    if "command_vel" in cfg.curriculum:
+        cfg.curriculum["command_vel"].params["velocity_stages"] = [
+            {"step": 0,
+             "lin_vel_x": (-0.02, 0.03),
+             "ang_vel_z": (-MAX_YAW * 0.5, MAX_YAW * 0.5)},
+            {"step": 72_000,
+             "lin_vel_x": (-MAX_FWD * 0.45, MAX_FWD * 0.7),
+             "ang_vel_z": (-MAX_YAW * 0.75, MAX_YAW * 0.75)},
+            {"step": 144_000,
+             "lin_vel_x": (-MAX_FWD * 0.6, MAX_FWD),
+             "ang_vel_z": (-MAX_YAW, MAX_YAW)},
+        ]
 
     cfg.terminations.pop("fell_over", None)
     cfg.terminations["illegal_contact"] = TerminationTermCfg(
