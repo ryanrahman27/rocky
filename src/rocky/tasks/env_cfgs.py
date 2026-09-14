@@ -172,6 +172,20 @@ def rocky_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     cfg.rewards["pose"].params["std_walking"] = walking
     cfg.rewards["pose"].params["std_running"] = walking
 
+    # Velocity tracking is exp(-error^2 / std^2), and mjlab's std is sized for a
+    # quadruped commanded at 1-3 m/s. At Rocky's 0.08 m/s it saturates: a robot
+    # standing perfectly still while commanded to walk scores 0.975 of maximum,
+    # so the term carries almost no gradient. The first trained policy exploited
+    # exactly that -- it stepped in place with a clean contact schedule and never
+    # translated, because striding cost more posture reward (-0.14) than the
+    # velocity reward it gained (+0.05).
+    #
+    # Scale each std by how much the command range shrank relative to the Go1
+    # defaults it was tuned against (lin 1.0 -> 0.08, ang 0.5 -> 0.3). Standing
+    # still now scores 0.018 instead of 0.975.
+    cfg.rewards["track_linear_velocity"].params["std"] = MAX_FWD * 0.5
+    cfg.rewards["track_angular_velocity"].params["std"] = math.sqrt(0.5) * (MAX_YAW / 0.5)
+
     cfg.rewards["upright"].params["asset_cfg"].body_names = (P.BASE_BODY,)
     cfg.rewards["upright"].params["terrain_sensor_names"] = ("terrain_scan",)
     cfg.rewards["body_ang_vel"].params["asset_cfg"].body_names = (P.BASE_BODY,)
