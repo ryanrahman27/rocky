@@ -1,4 +1,4 @@
-<mujoco model="rocky">
+<mujoco model="rocky_manip">
   <compiler angle="radian" meshdir="meshes" autolimits="true"/>
 
   <default>
@@ -63,6 +63,7 @@
     <mesh name="hull_tibia" file="hull_tibia.stl"/>
     <mesh name="hull_tibia_m" file="hull_tibia_m.stl"/>
     <mesh name="hull_gripper" file="hull_gripper.stl"/>
+    <mesh name="hull_gripper_nojaws" file="hull_gripper_nojaws.stl"/>
   </asset>
 
   <worldbody>
@@ -70,6 +71,7 @@
       <freejoint name="floating_base_joint"/>
       <inertial pos="0.0001749761 -0.0000434770 0.0527797235" mass="1.3323345375" fullinertia="0.00563132765455 0.00617944523274 0.00885178962494 1.18792858478e-05 6.73435054842e-06 -3.19068712785e-06"/>
       <site name="imu" pos="0 0 0.0125" size="0.005" group="4"/>
+      <camera name="head" pos="0.020 0 0.245" xyaxes="0 -1 0 0.707 0 0.707" fovy="68"/>
       <geom class="visual" mesh="base__Chassis" material="sandstone_dark"/>
       <geom class="visual" mesh="base__Carapace" material="sandstone"/>
       <geom class="visual" mesh="base__Shoulder_Boot" material="rubber"/>
@@ -108,18 +110,32 @@
             <geom name="tibia_0_collision" class="collision" type="mesh" mesh="hull_tibia_m"/>
             <body name="gripper_0" pos="0.0900000000 0 0">
               <joint name="wrist_0" axis="0 1 0" range="-1.3089969390 1.3089969390" actuatorfrcrange="-2.90 2.90"/>
-              <inertial pos="0.0351404471 -0.0001979038 0.0000000000" mass="0.1331457011" fullinertia="4.66083182644e-05 6.91403871936e-05 6.28312573096e-05 -5.00611665605e-06 -2.23750063156e-15 -8.47360828886e-09"/>
+              <inertial pos="0.033243401 -0.000732475 -0.000000000" mass="0.124612569" fullinertia="4.344245075e-05 6.167357151e-05 5.277738663e-05 -3.034311395e-06 5.288493907e-15 1.748420782e-16"/>
               <geom class="visual" mesh="gripper_m0__Gripper_Base" material="sandstone_dark"/>
-              <geom class="visual" mesh="gripper_m0__Jaw_R" material="sandstone_dark"/>
-              <geom class="visual" mesh="gripper_m0__Jaw_L" material="sandstone_dark"/>
               <geom class="visual" mesh="gripper_m0__Foot_Pad_Manip" material="rubber"/>
               <geom class="visual" mesh="gripper_m0__F6700ZZ_WristIdler" material="metal"/>
               <geom class="visual" mesh="gripper_m0__STS3215_Gripper" material="metal"/>
               <geom class="visual" mesh="gripper_m0__Horn_Gripper" material="metal"/>
               <geom class="visual" mesh="gripper_m0__Pinion_12T" material="metal"/>
-              <geom name="gripper_0_collision" class="collision" type="mesh" mesh="hull_gripper"/>
+              <geom name="gripper_0_collision" class="collision" type="mesh" mesh="hull_gripper_nojaws"/>
               <site name="foot_0" pos="0.0743601445 0 0" size="0.0100000000" group="4"/>
-              <geom name="foot_0_collision" class="collision" type="sphere" size="0.0100000000" pos="0.0743601445 0 0" condim="6" priority="1"/>
+              <body name="foot_0_tip">
+                <geom name="foot_0_collision" class="collision" type="sphere" size="0.0100000000" pos="0.0743601445 0 0" condim="6" priority="1"/>
+              </body>
+              <site name="grasp" pos="0.0675 0.0076 0" size="0.004" rgba="0 1 0 0.6" group="4"/>
+              <camera name="wrist" pos="0.020 0.0076 0.050" xyaxes="0 -1 0 0.342 0 0.940" fovy="70"/>
+              <body name="jaw_r">
+                <joint name="jaw_r" type="slide" axis="0 +1 0" range="0 0.0300" actuatorfrcrange="-20 20" damping="4" armature="0.4940"/>
+                <inertial pos="0.062843729 0.014425210 0.002834610" mass="0.004266566" fullinertia="1.072584532e-06 2.004299519e-07 1.052172069e-06 -5.420483582e-10 4.869729009e-08 7.820309846e-08"/>
+                <geom class="visual" mesh="gripper_m0__Jaw_R" material="sandstone_dark"/>
+                <geom name="jaw_r_pad" class="collision" type="box" size="0.0065 0.0030 0.0080" pos="0.0675 0.0106 0.0000" condim="6" priority="2" friction="1.4 0.05 0.002" solimp="0.95 0.99 0.001"/>
+              </body>
+              <body name="jaw_l">
+                <joint name="jaw_l" type="slide" axis="0 -1 0" range="0 0.0300" actuatorfrcrange="-20 20" damping="4" armature="0.4940"/>
+                <inertial pos="0.062843729 0.000792079 -0.002834610" mass="0.004266566" fullinertia="1.072584443e-06 2.004299452e-07 1.05217198e-06 5.420518925e-10 -4.869728848e-08 7.820309626e-08"/>
+                <geom class="visual" mesh="gripper_m0__Jaw_L" material="sandstone_dark"/>
+                <geom name="jaw_l_pad" class="collision" type="box" size="0.0065 0.0030 0.0080" pos="0.0675 0.0046 0.0000" condim="6" priority="2" friction="1.4 0.05 0.002" solimp="0.95 0.99 0.001"/>
+              </body>
             </body>
           </body>
         </body>
@@ -275,6 +291,15 @@
     </body>
   </worldbody>
 
+  <contact>
+    <exclude body1="jaw_r" body2="jaw_l"/>
+  </contact>
+
+  <actuator>
+    <position name="jaw_r" joint="jaw_r" kp="1950" kv="124.2" forcerange="-20 20" ctrlrange="0 0.030"/>
+    <position name="jaw_l" joint="jaw_l" kp="1950" kv="124.2" forcerange="-20 20" ctrlrange="0 0.030"/>
+  </actuator>
+
   <sensor>
     <gyro name="imu_ang_vel" site="imu"/>
     <velocimeter name="imu_lin_vel" site="imu"/>
@@ -291,6 +316,6 @@
     <exclude body1="base" body2="femur_4"/>
   </contact>
   <keyframe>
-    <key name="home" qpos="0 0 0.0450300000 1 0 0 0 0.0000000000 -0.8726646260 2.1293016874 0.0000000000 0.0000000000 -0.8726646260 2.1293016874 0.0000000000 -0.8726646260 2.1293016874 0.0000000000 -0.8726646260 2.1293016874 0.0000000000 -0.8726646260 2.1293016874"/>
+    <key name="home" qpos="0.0000000000 0.0000000000 0.0450300000 1.0000000000 0.0000000000 0.0000000000 0.0000000000 0.0000000000 -0.8726646260 2.1293016874 0.0000000000 0.0000000000 0.0000000000 0.0000000000 -0.8726646260 2.1293016874 0.0000000000 -0.8726646260 2.1293016874 0.0000000000 -0.8726646260 2.1293016874 0.0000000000 -0.8726646260 2.1293016874"/>
   </keyframe>
 </mujoco>

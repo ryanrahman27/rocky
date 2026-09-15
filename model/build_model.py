@@ -294,6 +294,16 @@ QJ = []
 for k, kind in LEGKIND:
     QJ += [0.0, Q_LIFT, Q_ELB] + ([0.0] if kind == 'm' else [])
 qpos = '0 0 %.10f 1 0 0 0 ' % BASE_Z + ' '.join('%.10f' % v for v in QJ)
+# The shoulder boot wraps the femur sleeve with about a tenth of a millimetre
+# of clearance -- it is a bearing interface, not a collision pair. The convex
+# hulls bridge that gap and interpenetrate by up to 15 mm, which MuJoCo then
+# resolves with contact forces of well over 100 N whenever a leg sweeps off
+# centre. Walking barely noticed (the sweep amplitude is ~10 deg); the arm
+# reaching for a cube jams solid. Base and coxa are already parent and child,
+# so only base/femur needs saying out loud.
+X += ['  <contact>']
+X += ['    <exclude body1="base" body2="femur_%d"/>' % k for k in range(5)]
+X += ['  </contact>']
 X += ['  <keyframe>', '    <key name="home" qpos="%s"/>' % qpos, '  </keyframe>', '</mujoco>']
 open(ROOT + '/rocky.xml', 'w').write('\n'.join(X) + '\n')
 print('wrote rocky.xml   nq_joints=%d' % len(QJ))

@@ -4,14 +4,19 @@ A five-legged walking robot, from CAD to a trained locomotion policy.
 
 Rocky is a pentapod: a 250 mm pentagonal body carrying five identical 342 mm
 limbs at 72° spacing, one of which doubles as a manipulator. This repo holds the
-simulation model exported from the Fusion 360 master, an analytic wave gait, and
-a PPO locomotion task for [mjlab](https://github.com/mujocolab/mjlab).
+simulation model exported from the Fusion 360 master, an analytic wave gait, a
+PPO locomotion task for [mjlab](https://github.com/mujocolab/mjlab), and a
+manipulation stack that walks up to two cubes and stacks one on the other.
 
 ![Rocky walking, trained policy](docs/gait_policy.gif)
 
 *The trained PPO policy: walking forward at 0.06 m/s (left), turning in place at
 0.15 rad/s (right). Full clips: [forward](docs/rocky_walk_forward.mp4),
 [turning](docs/rocky_turn_in_place.mp4).*
+
+*Walking up to two cubes and stacking the red one on the blue:
+[docs/rocky_stack.mp4](docs/rocky_stack.mp4). The locomotion controller parks the
+robot, then hands over to the arm.*
 
 ![Rocky walking with the scripted wave gait](docs/gait_wave.gif)
 
@@ -24,6 +29,7 @@ time, in the order 0 → 2 → 4 → 1 → 3.*
 uv sync --extra gait                       # mujoco only, no CUDA needed
 uv run python scripts/play_gait.py --vx 0.052 --seconds 12
 uv run python -m mujoco.viewer --mjcf=model/rocky_standalone.xml
+uv run python scripts/stack_demo.py --episodes 5      # walk up and stack, no GPU
 ```
 
 Training needs Linux + an NVIDIA GPU (mjlab runs on MuJoCo-Warp):
@@ -42,24 +48,32 @@ uv run play  Mjlab-Velocity-Flat-Rocky --wandb-run-path <org/project/run-id>
 model/          MJCF + URDF exported from Fusion, per-link meshes, collision hulls
   rocky.xml            the model mjlab loads (no actuators; CAD "home" keyframe)
   rocky_standalone.xml + floor, light and position servos, for plain MuJoCo
+  rocky_manip.xml      + working jaws, grasp site, head and wrist cameras
+  rocky_cubes.xml      + floor, two cubes and the walking servos: the stacking scene
   rocky.urdf           for Isaac Lab / pinocchio / ROS
   build_model.py       regenerates all of the above from the Fusion export
+  add_manipulation.py  derives rocky_manip.xml from rocky.xml
 src/rocky/
   model_params.py      lengths, limits, servo constants (asserted against the MJCF)
   kinematics.py        per-leg analytic FK/IK
   gait.py              the wave gait
+  arm.py               leg 0 as a 4-DOF arm: FK, IK, approach-angle search
+  approach.py          walking to a stand-off pose in front of the cubes
+  stack.py             the scripted brace-and-stack sequence
   tasks/               mjlab task: entity, env cfgs, PPO cfg
   tasks/mdp/           gait-phase observation and reward terms
-scripts/        play_gait.py (open loop), train.sh, play.sh
-docs/           model.md (the robot), gait.md (the gait and what limits it)
-tests/          kinematics, gait invariants, model/MJCF agreement, reward maths
+scripts/        play_gait.py (open loop), stack_demo.py, train.sh, play.sh
+docs/           model.md (the robot), gait.md (the gait), manipulation.md (the arm)
+tests/          kinematics, gait invariants, model/MJCF agreement, reward maths,
+                arm kinematics against the MJCF, the stacking sequence, approach
 ```
 
 ## The robot
 
 4.170 kg all-up, including 430 g of declared payload. 16 actuated joints: five
-legs × (sweep, lift, elbow), plus a wrist on the manipulator limb, whose gripper
-is welded shut so its rubber pad serves as the fifth foot. Every joint is a
+legs × (sweep, lift, elbow), plus a wrist on the manipulator limb. For
+locomotion its gripper is welded shut and its rubber pad serves as the fifth
+foot; `model/rocky_manip.xml` unwelds the jaws, adding two more. Every joint is a
 Feetech STS3215 — 2.9 N·m, 1:345, and compliant enough that it shapes how the
 robot walks (see below). [docs/model.md](docs/model.md) has the joint table,
 mass breakdown and modelling assumptions.
@@ -159,6 +173,36 @@ commanded to walk scored 0.975 of maximum.
 
 Trust `scripts/eval_policy.py` over the reward table.
 
+## Manipulation
+
+Leg 0 is both a leg and an arm. `scripts/stack_demo.py` runs the whole thing in
+plain MuJoCo — no GPU, no mjlab:
+
+```bash
+uv run python scripts/stack_demo.py --video docs/rocky_stack.mp4
+uv run python scripts/stack_demo.py --episodes 20               # success rate
+uv run python scripts/stack_demo.py --episodes 50 --dataset data/stack.npz
+```
+
+Three phases with a handoff between them. A locomotion controller walks the robot
+to a stand-off pose in front of the cubes; both controllers hold the stance for a
+beat; then `rocky.stack` widens the four stance legs into a brace, lifts leg 0 off
+the ground and runs the pick-and-place, with the other four holding station
+throughout. The walk is driven by the analytic gait today, and the trained policy
+plugs into the same slot — `rocky.approach` emits the same `(vx, vy, wz)` twist.
+
+**20 of 20 episodes stacked**, over randomised cube layouts (115–150 mm apart,
+340–380 mm out, within ±12°) and randomised spawns (0.6–1.2 m back, within ±30°).
+Final stack offset 7–9 mm against a 20 mm cube half-width; max body tilt 3.3°.
+
+`--dataset` writes the head and wrist camera views, the joint state, the action
+and the phase label at 20 Hz for the manipulation segment — the demonstrations a
+VLA needs to take over that half.
+
+[docs/manipulation.md](docs/manipulation.md) covers the arm's kinematics, the
+approach-angle search the ±75° wrist forces, the four pieces of geometry that
+break the obvious version of this script, and the measured working envelope.
+
 ## Tests
 
 ```bash
@@ -179,8 +223,13 @@ Next:
 
 - **Rough terrain.** `Mjlab-Velocity-Rough-Rocky` is registered and configured;
   the blind variant lets the current checkpoint be tried on terrain first.
-- **Manipulation.** Leg 0's wrist and gripper are modelled but welded shut for
-  locomotion. Walking to an object and stacking it is the next milestone.
+- **A VLA for the manipulation half.** The scripted sequence is a demonstrator,
+  not the destination: `scripts/stack_demo.py --dataset` already writes what a
+  policy needs to learn it. Registering the cube scene as an mjlab task, so the
+  arm can also be trained or fine-tuned with RL, is the piece that is missing.
+- **Widening the arm's envelope.** The scripted stack fails inside 320 mm and
+  outside ±15° of bearing (docs/manipulation.md has the table). The approach
+  controller avoids both, but a learned policy should not have to.
 - **ONNX export** currently fails on an rsl-rl/mjlab version mismatch
   (`Logger` has no `logger_type`). The `.pt` checkpoints are fine.
 - **`ROTOR_INERTIA`** in `model_params.py` is assumed — Feetech publish no

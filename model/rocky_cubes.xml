@@ -1,0 +1,87 @@
+<mujoco model="rocky_cubes">
+  <!-- Stacking scene: Rocky with a working gripper, a floor, and two cubes.
+       Driven by scripts/stack_demo.py, which walks in with the locomotion
+       policy and then hands off to the arm controller. -->
+  <include file="rocky_manip.xml"/>
+
+  <option timestep="0.005" iterations="10" ls_iterations="20" cone="elliptic" impratio="10"/>
+  <statistic center="0 0 0.1" extent="1.2"/>
+
+  <visual>
+    <global offwidth="1280" offheight="960"/>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.35 0.35 0.35" specular="0.1 0.1 0.1"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <quality shadowsize="4096"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+    <texture type="2d" name="grid" builtin="checker" rgb1="0.24 0.30 0.36" rgb2="0.18 0.24 0.30"
+             width="300" height="300"/>
+    <material name="grid" texture="grid" texrepeat="10 10" texuniform="true" reflectance="0.05"/>
+    <material name="cube_red" rgba="0.72 0.16 0.14 1" specular="0.3" shininess="0.3"/>
+    <material name="cube_blue" rgba="0.16 0.32 0.70 1" specular="0.3" shininess="0.3"/>
+  </asset>
+
+  <worldbody>
+    <light pos="1.2 0.6 2.0" dir="-0.4 -0.2 -1" directional="true" diffuse="0.5 0.5 0.5"/>
+    <light pos="-0.8 -0.8 1.6" dir="0.3 0.3 -1" directional="true" diffuse="0.25 0.25 0.25"/>
+    <geom name="floor" type="plane" size="0 0 0.05" material="grid"
+          condim="6" friction="1.0 0.02 0.001" priority="0"/>
+
+    <!-- 40 mm cubes: the jaws open to 60 mm, so there is 10 mm of clearance a
+         side. ~35 g each, in the range of a printed or hardwood block. -->
+    <body name="cube_red" pos="0.34 0.06 0.02">
+      <freejoint name="cube_red_free"/>
+      <geom name="cube_red" type="box" size="0.02 0.02 0.02" material="cube_red"
+            mass="0.035" condim="6" friction="1.1 0.03 0.001" solimp="0.95 0.99 0.001"/>
+      <site name="cube_red_site" pos="0 0 0" size="0.004" rgba="1 0 0 0.4" group="4"/>
+    </body>
+
+    <body name="cube_blue" pos="0.34 -0.06 0.02">
+      <freejoint name="cube_blue_free"/>
+      <geom name="cube_blue" type="box" size="0.02 0.02 0.02" material="cube_blue"
+            mass="0.035" condim="6" friction="1.1 0.03 0.001" solimp="0.95 0.99 0.001"/>
+      <site name="cube_blue_site" pos="0 0 0" size="0.004" rgba="0 0 1 0.4" group="4"/>
+    </body>
+
+    <camera name="scene" pos="1.1 -0.9 0.7" xyaxes="0.63 0.78 0 -0.33 0.27 0.90"/>
+    <!-- Keeps the robot centred however it parks; scripts/stack_demo.py cuts to
+         this one at the handoff, where all the interesting motion is. -->
+    <camera name="closeup" mode="targetbody" target="base" pos="0.78 -0.52 0.36" fovy="50"/>
+  </worldbody>
+
+  <!-- Leg 0's foot sphere is a walking geom sitting between the open jaws. It
+       has no business touching a cube the gripper is trying to close on; the
+       jaw pads and the gripper hull still do. -->
+  <contact>
+    <exclude body1="foot_0_tip" body2="cube_red"/>
+    <exclude body1="foot_0_tip" body2="cube_blue"/>
+  </contact>
+
+  <!-- The 16 walking servos. The two jaw actuators come from rocky_manip.xml. -->
+  <actuator>
+    <position name="sweep_0" joint="sweep_0" kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="lift_0"  joint="lift_0"  kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="elbow_0" joint="elbow_0" kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="wrist_0" joint="wrist_0" kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="sweep_1" joint="sweep_1" kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="lift_1"  joint="lift_1"  kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="elbow_1" joint="elbow_1" kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="sweep_2" joint="sweep_2" kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="lift_2"  joint="lift_2"  kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="elbow_2" joint="elbow_2" kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="sweep_3" joint="sweep_3" kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="lift_3"  joint="lift_3"  kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="elbow_3" joint="elbow_3" kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="sweep_4" joint="sweep_4" kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="lift_4"  joint="lift_4"  kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+    <position name="elbow_4" joint="elbow_4" kp="23.495" kv="1.4957" forcerange="-2.90 2.90" ctrlrange="-3.15 3.15"/>
+  </actuator>
+  <!-- Full scene pose. The include's robot-only "home" key pads the cubes
+       with zeros, which makes their quaternions degenerate; use this one.
+       scripts/stack_demo.py overwrites the cube poses per episode anyway. -->
+  <keyframe>
+    <key name="start" qpos="0 0 0.04503 1 0 0 0 0 -0.872664626 2.129301687 0 0 0 0 -0.872664626 2.129301687 0 -0.872664626 2.129301687 0 -0.872664626 2.129301687 0 -0.872664626 2.129301687 0.34 0.06 0.02 1 0 0 0 0.34 -0.06 0.02 1 0 0 0"/>
+  </keyframe>
+</mujoco>
