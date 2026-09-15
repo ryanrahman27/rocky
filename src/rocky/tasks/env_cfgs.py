@@ -288,6 +288,27 @@ def rocky_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     return cfg
 
 
+def rocky_rough_blind_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
+    """Rough terrain, but proprioception only -- no height scan.
+
+    The rough task feeds the policy a terrain height scan, which makes its
+    observation vector wider than the flat task's. A policy trained on flat
+    ground therefore cannot be loaded into it at all: the first layer is the
+    wrong shape.
+
+    This variant keeps the terrain and drops the height-scan *observations*, so
+    the observation layout matches the flat task exactly and a flat-trained
+    checkpoint runs unchanged. What you get is blind locomotion: the robot feels
+    the ground through its feet and IMU but cannot see it coming. That is a fair
+    test of how far a flat-trained gait carries, and a reasonable thing to train
+    on its own -- a lot of legged robots ship blind.
+    """
+    cfg = rocky_rough_env_cfg(play=play)
+    for group in ("actor", "critic"):
+        cfg.observations[group].terms.pop("height_scan", None)
+    return cfg
+
+
 def rocky_flat_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     """Rocky velocity tracking on flat ground. Start here."""
     cfg = rocky_rough_env_cfg(play=play)

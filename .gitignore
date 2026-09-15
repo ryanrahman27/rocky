@@ -5,7 +5,9 @@ uv.lock
 logs/
 outputs/
 wandb/
+# videos: keep the two short demo clips, ignore anything else
 *.mp4
+!docs/rocky_*.mp4
 *.gif
 !docs/*.gif
 .DS_Store
