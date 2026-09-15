@@ -112,14 +112,14 @@ def rocky_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     cfg.observations["critic"].terms["gait_clock"] = clock
 
     # --- gait shaping -------------------------------------------------------
-    # Weight 2.5 puts the schedule on a par with velocity tracking (2.0 + 2.0).
-    # At 1.0 a policy that tracks velocity with a shuffle scores ~93% of the
-    # velocity reward and ~75% of this one, and has no reason to restructure its
-    # gait; the last quarter of the gait reward has to be worth more than the
-    # velocity tracking it costs to reorganise.
+    # Back to 1.0. At 2.5 this term was strong enough to pay for its own local
+    # optimum: it constrains contact *timing* only, so a policy collects it in
+    # full by stepping on the spot, which is what the second run learned (0.877
+    # schedule match, 11-30% of commanded speed, zero yaw). The imitation term
+    # below now carries the gait, and it constrains foot placement too.
     cfg.rewards["gait_contact"] = RewardTermCfg(
         func=gait_mdp.gait_contact_schedule,
-        weight=2.5,
+        weight=1.0,
         params={
             "sensor_name": feet_ground_cfg.name,
             "command_name": "twist",
@@ -128,6 +128,17 @@ def rocky_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
             "swing_fraction": GAIT.swing_fraction,
         },
     )
+    # Imitate the analytic wave gait's whole posture. Measured in this exact
+    # environment, that controller reaches 82-87% of every command including
+    # turning, where the policy trained without it reached 11-30% forward and 0%
+    # yaw. Lower this weight once a policy beats the reference, since the
+    # reference is only a good teacher, not a ceiling worth defending.
+    cfg.rewards["gait_imitation"] = RewardTermCfg(
+        func=gait_mdp.gait_imitation,
+        weight=1.0,
+        params={"command_name": "twist", "period": GAIT.period, "std": 0.10},
+    )
+
     cfg.rewards["gait_swing_height"] = RewardTermCfg(
         func=gait_mdp.gait_swing_clearance,
         weight=-1.5,

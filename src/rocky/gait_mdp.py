@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING
 import torch
 
 from rocky.gait import GaitParams
+from rocky.gait_torch import TorchGait
 
 if TYPE_CHECKING:
     from mjlab.envs import ManagerBasedRlEnv
@@ -170,3 +171,53 @@ def gait_swing_clearance(
         torch.clamp((torch.sum(torch.square(err) * swinging, dim=1) / n_swing).mean(), min=0.0)
     )
     return cost
+
+
+_GAIT_CACHE: dict = {}
+
+
+def _torch_gait(env, params: GaitParams) -> TorchGait:
+    key = (str(env.device), params)
+    if key not in _GAIT_CACHE:
+        _GAIT_CACHE[key] = TorchGait(params, env.device)
+    return _GAIT_CACHE[key]
+
+
+def gait_imitation(
+    env: ManagerBasedRlEnv,
+    command_name: str,
+    period: float = _DEFAULT.period,
+    std: float = 0.15,
+    command_threshold: float = 0.02,
+    asset_name: str = "robot",
+) -> torch.Tensor:
+    """Reward matching the scripted wave gait's joint trajectory, shape [B].
+
+    The contact-schedule reward constrains *when* each foot is down but says
+    nothing about *where* it is placed, so a policy can collect it in full by
+    stepping on the spot -- which is exactly what the first two runs learned. This
+    term closes that gap by handing the policy the whole reference posture the
+    analytic gait would command at this phase and this env's commanded velocity.
+    That controller reaches 82-87% of every command in this environment, so it is
+    a reference worth imitating, not just a rhythm.
+
+    The reference comes from `rocky.gait_torch`, checked against the numpy gait in
+    tests. Near zero command it blends to the default standing pose, so a robot
+    asked to hold still is not also asked to march on the spot.
+    """
+    asset = env.scene[asset_name]
+    gait = _torch_gait(env, GaitParams(period=period))
+
+    command = env.command_manager.get_command(command_name)
+    assert command is not None, f"Command '{command_name}' not found."
+
+    q_gait = gait.joint_targets(gait_phase(env, period), command)
+    q_stand = asset.data.default_joint_pos
+    act = _activity(env, command_name, command_threshold)[:, None]
+    q_ref = act * q_gait + (1.0 - act) * q_stand
+
+    err = asset.data.joint_pos - q_ref
+    reward = torch.exp(-torch.mean(torch.square(err), dim=1) / std**2)
+
+    env.extras["log"]["Metrics/gait_imitation_err"] = torch.sqrt(torch.mean(torch.square(err)))
+    return reward
