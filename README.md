@@ -14,7 +14,8 @@ manipulation stack that walks up to two cubes and stacks one on the other.
 0.15 rad/s (right). Full clips: [forward](docs/rocky_walk_forward.mp4),
 [turning](docs/rocky_turn_in_place.mp4).*
 
-*Walking up to two cubes and stacking the red one on the blue:
+*The diffusion policy driving, blind: [docs/rocky_policy.mp4](docs/rocky_policy.mp4).
+Walking up to two cubes and stacking the red one on the blue:
 [docs/rocky_stack.mp4](docs/rocky_stack.mp4). The locomotion controller parks the
 robot, then hands over to the arm.*
 
@@ -248,10 +249,16 @@ two observations. The observation is 319 floats — sonar residuals, the fan, th
 pads, joints, IMU — so the whole thing is an MLP rather than a ResNet and it
 trains on a laptop CPU in minutes.
 
-Trained on 11 demonstrations it reproduces the script to a **median 12 mrad**
-per joint over a sampled chunk (p90 57 mrad). That is enough to say the pipeline
-works end to end; it is not enough demonstrations to close the loop on, and the
-closed-loop rollout is the next thing to do.
+Trained on **283 demonstrations** (320 generated, 88% of them successful) it
+reproduces the demonstrator to a median 0.22 mrad per joint on episodes it has
+never seen — the same as on its training data, so nothing is being memorised.
+
+Driving the robot in closed loop over 30 fresh episodes, it puts the red cube on
+top of the blue one and leaves it fully supported **19 times out of 30**; 12 of
+those are inside the strict 14 mm the scripted demonstrator is scored by, against
+the script's own 88%. It transfers, and it is worse than what it was cloned
+from, which is the normal state of behaviour cloning and worth saying rather than
+quoting the open-loop number and stopping there.
 
 Chunking matters because the demonstrator's action depends on where it is in a
 fifteen-second sequence, and "descending onto the cube" looks much like "lowering
@@ -280,9 +287,10 @@ Next:
 
 - **Rough terrain.** `Mjlab-Velocity-Rough-Rocky` is registered and configured;
   the blind variant lets the current checkpoint be tried on terrain first.
-- **Close the loop on the diffusion policy.** Eleven demonstrations prove the
-  pipeline; a few hundred are needed before rolling it out in the sim means
-  anything. Generating them is embarrassingly parallel.
+- **Close the 63%-to-88% gap.** The policy grips cleanly — the jaw command is
+  decisive and pad force reaches the full 20 N even in failed rollouts — so the
+  losses are in what happens after the grasp. More demonstrations, a longer
+  action horizon and DAgger on the states it actually visits are all untried.
 - **An mjlab task for the cube scene**, so the arm can also be trained or
   fine-tuned with RL rather than only cloned.
 - **Widening the arm's envelope.** The scripted stack fails inside 320 mm and

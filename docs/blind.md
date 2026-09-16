@@ -145,7 +145,92 @@ No images anywhere:
 | joint positions | 18 | rad, m for the jaws |
 | joint velocities | 18 | |
 | IMU | 6 | gyro and up-vector |
+| cube belief | 4 | body-frame xy of each cube |
 
-About 320 floats — smaller than a single 16×16 image patch, and every one of
-them is something the hardware would actually have. A state-only diffusion policy
-over this is small enough to train in minutes.
+323 floats — smaller than a single 16×16 image patch, and every one of them is
+something the hardware would actually have.
+
+The cube belief is the one derived quantity, and it earns its place. The
+pick-and-place lasts fifteen seconds, and for most of it the cubes are under the
+gripper and inaudible; a policy conditioned on two frames of raw sensor has no
+way to know where it was going. The robot works the belief out for itself from
+the feel sweep, so conditioning on it is not smuggling in ground truth — it is
+the split between perception and control that any real stack has.
+
+What the belief does *not* say is which half of the job is in progress. The touch
+pads do: loaded means carrying, and descending while carrying is a place rather
+than a pick. That is the whole disambiguation, and it is a sensor reading.
+
+## The policy
+
+`scripts/train_diffusion.py` is Diffusion Policy (Chi et al. 2023) at its
+smallest useful size: a DDPM over 8-step action chunks conditioned on the last
+two observations, cosine schedule, 50 denoising steps. 323 floats in and no
+images means an MLP rather than a ResNet, and it trains on a CPU.
+
+- **Chunks**, because the demonstrator's action depends on where it is in a
+  fifteen-second sequence, and "descending onto the cube" looks much like
+  "lowering it onto the other one" from a single frame.
+- **Diffusion**, because the interesting moments are multimodal: when the pads
+  say the grasp missed, the demonstrator sometimes nudges and closes again and
+  sometimes lifts off and re-sweeps, and averaging those gives a motion that does
+  neither.
+
+Two things that were wrong before any number from it meant anything:
+
+**The sampler.** The textbook DDPM step divides by √α, which is a factor of
+thirty at the noisy end of a 50-step cosine schedule, and any error in the
+predicted noise is amplified by it. Sampled chunks came out about two radians
+from anything the demonstrator ever did, off a model whose training loss was
+perfectly healthy. Reconstructing x₀, clamping it to the range normalised actions
+live in, and taking the posterior mean fixed it — 1914 mrad to 12.
+
+**The split.** Windows overlap by all but one frame, so holding out random
+windows scores the model on data it has all but memorised. Whole episodes are
+held out instead. Runs are also cut at every discontinuity rather than only at
+episode boundaries, because a failed grasp sends the demonstrator back to the
+feel sweep and a window straddling that gap would teach a jump that never
+happened.
+
+`scripts/eval_diffusion.py` rolls it out. Perception — brace, lift, sweep — stays
+scripted, because it is a sensing routine rather than a skill; the policy
+replaces the fifteen seconds after it, on a receding horizon that executes four
+steps of each predicted chunk and re-plans.
+
+### Results
+
+320 episodes generated across two workers, randomised wider than the success
+envelope (cubes 100–165 mm apart, ±18° of bearing, 320–400 mm out, robot parked
+anywhere in a 70 mm band, 5 mrad of jitter on every arm target). **283 of 320
+stacked**, and those 283 are the training set: 81,787 samples, 53,487 windows
+after filtering to the `stack` phase.
+
+Open loop, 120 epochs, 28 episodes held out entirely:
+
+| | median | p90 |
+|---|---|---|
+| training chunk error | 0.22 mrad | 0.013 rad |
+| held-out chunk error | 0.23 mrad | 0.013 rad |
+
+Identical on data it has never seen, which is what 283 episodes buys over the 11
+this started with.
+
+Closed loop, 30 fresh episodes with the policy driving:
+
+| | |
+|---|---|
+| red cube on top and fully supported | **19/30 (63%)** |
+| inside the strict 14 mm the script is scored by | 12/30 (40%) |
+| offset when it lands | median 13.3 mm, worst 18.6 mm |
+| the scripted demonstrator, same test | 283/320 (88%) |
+
+So it transfers, and it is worse than what it was cloned from — which is the
+normal state of affairs for behaviour cloning and worth saying plainly rather
+than quoting the open-loop number and moving on. The gap is about 3 mm of
+placement accuracy and a chunk of outright failures.
+
+One thing the failures are *not*: indecision at the gripper. Logging the jaw
+command through failed rollouts, it swings cleanly between fully open and fully
+closed and spends under a fifth of its time anywhere in between, and peak pad
+force reaches the full 20 N even in episodes that end badly. The policy grips.
+What it does with the cube afterwards is where it loses them.

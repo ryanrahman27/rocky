@@ -151,3 +151,28 @@ def test_the_belief_coasts_when_the_sonar_goes_quiet(rig):
     expect = np.array([c * before[0] - s * before[1], s * before[0] + c * before[1]])
     assert np.hypot(*(pair.midpoint - expect)) < 0.02
     assert pair.age == pytest.approx(0.5, abs=1e-6)
+
+
+def test_the_observation_is_the_size_it_claims_and_holds_no_secrets(rig):
+    """A policy trained on this has to be runnable on hardware."""
+    from rocky.sonar import observation
+    m, son, acts, qa, key, stance = rig
+    d = place(rig, (0.34, 0.06), (0.34, -0.06))
+    obs = observation(son, d, qa, acts, belief=np.array([0.34, 0.06, 0.34, -0.06]))
+    assert obs.dtype == np.float32
+    assert obs.shape == (len(son.ring) + len(son.fan) + 2 + 2 * len(acts) + 6 + 4,)
+    assert np.isfinite(obs).all()
+    # every element is a sensor reading, a joint, or the robot's own belief
+    assert np.allclose(obs[:len(son.ring)], son.residual(son.ranges(d), son.up(d)))
+    assert np.allclose(obs[-4:], [0.34, 0.06, 0.34, -0.06])
+
+
+def test_the_belief_is_the_only_derived_quantity(rig):
+    """Without it the observation is the same however far away the cubes are."""
+    from rocky.sonar import observation
+    m, son, acts, qa, key, stance = rig
+    d = place(rig, (0.34, 0.06), (0.34, -0.06))
+    a = observation(son, d, qa, acts, belief=np.array([0.34, 0.06, 0.34, -0.06]))
+    b = observation(son, d, qa, acts, belief=np.array([0.36, 0.05, 0.33, -0.07]))
+    assert np.allclose(a[:-4], b[:-4])
+    assert not np.allclose(a[-4:], b[-4:])

@@ -290,16 +290,29 @@ def _split_wide(points: np.ndarray, group: list[int]) -> list[list[int]]:
     return _split_wide(points, lo) + _split_wide(points, hi)
 
 
-def observation(sonar: "Sonar", data, qadr, names) -> np.ndarray:
+def observation(sonar: "Sonar", data, qadr, names, belief=None) -> np.ndarray:
     """Everything a blind policy is allowed to see, as one flat vector.
 
     No images anywhere: sonar residuals, the gripper's fan, the touch pads, the
     joints and the IMU. Residuals rather than raw ranges, because "how much
     nearer than the ground" does not move when the gait bobs the body up and
     down, and the policy should not have to learn that it does not matter.
+
+    `belief` is where the robot currently thinks the two cubes are, in its own
+    frame, which is the one derived quantity in here. It earns its place: the
+    pick-and-place lasts fifteen seconds and the cubes are under the gripper and
+    inaudible for most of it, so a policy conditioned on two frames of raw sensor
+    has no way to know where it was going. The robot works this out for itself
+    from the feel sweep, so conditioning on it is not smuggling in ground truth
+    -- it is the split between perception and control that any real stack has.
+
+    What the belief does NOT say is which half of the job is in progress. The
+    touch pads do: loaded means carrying, and descending while carrying is a
+    place rather than a pick.
     """
     q = np.array([data.qpos[qadr[n]] for n in names])
     dq = np.array([data.qvel[qadr[n] - 1] for n in names])
+    b = np.zeros(4) if belief is None else np.asarray(belief, float).reshape(-1)[:4]
     return np.concatenate([
         sonar.profile(data),
         np.minimum(sonar.feel(data), 0.5),
@@ -308,6 +321,7 @@ def observation(sonar: "Sonar", data, qadr, names) -> np.ndarray:
         data.sensordata[sonar._gyro_adr:sonar._gyro_adr + 3] if sonar._gyro_adr is not None
         else np.zeros(3),
         sonar.up(data),
+        b,
     ]).astype(np.float32)
 
 

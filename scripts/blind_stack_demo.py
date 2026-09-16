@@ -68,6 +68,39 @@ def _carry_xy(p, dt, wz, v):
             - np.asarray(v, float)[:2] * dt)
 
 
+def parked_pose(rng, red, blue, prior_sigma: float = 0.020):
+    """A robot already standing where the walk-up would have left it.
+
+    Generating manipulation data does not need the approach re-simulated every
+    time -- it is the locomotion controller's job and it triples the cost of an
+    episode. This puts the robot at a randomised stand-off instead, spread wider
+    than the approach controller actually parks, so the data covers poses the
+    script would rarely produce.
+
+    The belief it starts with is the TRUE pair blurred by 20 mm, which is what
+    the body ring's own accuracy is. That stands in for the handover, not for
+    perception: the feel sweep still has to find the cubes properly, and it is
+    the sweep's 5 mm answer that the pick is actually made from.
+    """
+    red, blue = np.asarray(red, float), np.asarray(blue, float)
+    mid = (red + blue) / 2.0
+    axis = red - blue
+    n = np.array([axis[1], -axis[0]])
+    n = n / max(float(np.hypot(*n)), 1e-9)
+    if float(n @ -mid) < 0.0:
+        n = -n
+    stand = rng.uniform(0.330, 0.400)
+    base = mid + stand * n
+    yaw = math.atan2(*(mid - base)[::-1]) + rng.uniform(-0.10, 0.10)
+    c, s_ = math.cos(yaw), math.sin(yaw)
+    R = np.array([[c, s_], [-s_, c]])                      # world -> body
+    belief = type("P", (), {
+        "left": R @ (red - base) + rng.normal(0.0, prior_sigma, 2),
+        "right": R @ (blue - base) + rng.normal(0.0, prior_sigma, 2),
+    })()
+    return base, yaw, belief
+
+
 def _lone_pair(target):
     """Stand in for a pair when only one object was ever heard."""
     t = np.asarray(target, float)
@@ -92,6 +125,9 @@ class Blind:
         #: teaches a policy nothing about recovering from a wobble, and the first
         #: time it lands slightly off-nominal it has no idea what to do.
         self.noise = noise
+        self.frame_belief = True
+        self.belief = np.zeros(4)
+        self.last_joints: dict[str, float] = {}
         self.rng = rng if rng is not None else np.random.default_rng(0)
         sid = lambda n: mujoco.mj_name2id(scene.m, mujoco.mjtObj.mjOBJ_SENSOR, n)  # noqa: E731
         self.gyro = scene.m.sensor_adr[sid("imu_ang_vel")]
@@ -109,7 +145,8 @@ class Blind:
                       for k in range(P.N_LEGS)])
         return limb_points(q)
 
-    def run(self, log=None, on_step=None, timeout: float = 90.0, debug=None, record=None):
+    def run(self, log=None, on_step=None, timeout: float = 90.0, debug=None, record=None,
+            start_phase: str = "listen", seed_pair=None, stop_at: str | None = None):
         sc, d = self.sc, self.sc.d
         t, dt = 0.0, sc.dt
         n_ctrl = max(1, int(round(1.0 / (CONTROL_HZ * dt))))
@@ -117,15 +154,20 @@ class Blind:
         sensor_bit = int(mujoco.mjtDisableBit.mjDSBL_SENSOR)
         joints = gait_joints(self.gait, 0.0, 0.0, 0.0, 0.0)
         tick = 0
-        phase, t_phase = "listen", 0.0
+        phase, t_phase = start_phase, 0.0
         self.track.reset()
         pair = None
-        self.parked = None
+        self.parked = _lone_pair((0.36, 0.0)) if seed_pair is None else seed_pair
         self.lone = None
+        if start_phase != "listen":
+            self.stack.reset(self.parked.left, self.parked.right,
+                             floor_z=self.sonar.floor_z(d), frame="body")
+            self.belief = np.concatenate([self.parked.left, self.parked.right])
         red = blue = None
         attempt = 0
         stack_t0 = 0.0
         result = dict(phase_log=[], attempts=0, grip_checked=False, gripped=False)
+        self.belief = np.zeros(4)
 
         while t < timeout:
             if tick % n_ctrl:
@@ -210,6 +252,7 @@ class Blind:
                     # air and the jaws close on nothing at all.
                     self.stack.reset(held.left, held.right,
                                      floor_z=self.sonar.floor_z(d), frame="body")
+                    self.belief = np.concatenate([held.left, held.right])
                     phase, t_phase = "brace", t
             elif phase == "brace":
                 self.stack.carry(cdt, wz, v)
@@ -223,6 +266,7 @@ class Blind:
                 if done:
                     red, blue = self._scan_result(pair if pair is not None else self.parked)
                     self.stack.reset(red, blue, floor_z=self.sonar.floor_z(d), frame="body")
+                    self.belief = np.concatenate([red, blue])
                     stack_t0 = self.stack.time_of("to_red")
                     phase, t_phase = "stack", t - stack_t0
             else:                                   # stack
@@ -244,10 +288,19 @@ class Blind:
                 if rel >= self.stack.duration:
                     break
 
+            if self.frame_belief and phase in ("brace", "feel", "stack"):
+                self.belief[:2] = _carry_xy(self.belief[:2], dt, wz, v)
+                self.belief[2:] = _carry_xy(self.belief[2:], dt, wz, v)
+            if stop_at is not None and phase == stop_at:
+                # Hand over mid-episode: the caller takes the robot from here.
+                self.last_joints = dict(joints)
+                result.update(t=t, red=red, blue=blue, phase=phase)
+                return result
             if self.noise > 0.0 and phase in ("feel", "stack"):
                 joints = dict(joints)
                 for n in ("sweep_0", "lift_0", "elbow_0", "wrist_0"):
                     joints[n] = float(joints[n] + self.rng.normal(0.0, self.noise))
+            self.last_joints = dict(joints)
             if record is not None:
                 record(t, phase, joints)
             sc.apply(joints)
@@ -321,20 +374,29 @@ def main() -> int:
     ap.add_argument("--noise", type=float, default=0.0,
                     help="rad of jitter on the arm targets, for recovery data")
     ap.add_argument("--record-dt", type=float, default=0.05)
+    ap.add_argument("--skip-walk", action="store_true",
+                    help="spawn already parked; generates manipulation data 3x faster")
+    ap.add_argument("--shard", type=int, default=0)
+    ap.add_argument("--shards", type=int, default=1)
+    ap.add_argument("--wide", action="store_true", help="randomise past the success envelope")
     ap.add_argument("--timeout", type=float, default=110.0)
     ap.add_argument("--cubes", type=float, nargs=4, default=None)
     ap.add_argument("--start", type=float, nargs=3, default=None)
     args = ap.parse_args()
 
-    rng = np.random.default_rng(args.seed)
+    rng = np.random.default_rng(args.seed + 7919 * args.shard)
     ok = 0
     frames = []
     episodes_out = []
     for ep in range(args.episodes):
         sc = Scene()
         red, blue = layout(rng, args)
+        seed_pair, start_phase = None, "listen"
         if args.start is not None:
             base_xy, yaw = np.array(args.start[:2]), args.start[2]
+        elif args.skip_walk:
+            base_xy, yaw, seed_pair = parked_pose(rng, red, blue)
+            start_phase = "brace"
         else:
             base_xy, yaw = spawn_pose(rng, (red + blue) / 2.0)
         b = Blind(sc, retries=args.retries, noise=args.noise,
@@ -368,12 +430,13 @@ def main() -> int:
                     return
                 nxt_rec[0] = t + args.record_dt
                 samples.append((t, phase,
-                                observation(b.sonar, sc.d, sc.qadr, obs_names),
+                                observation(b.sonar, sc.d, sc.qadr, obs_names, b.belief),
                                 np.array([joints[n] for n in obs_names], np.float32)))
         else:
             record = None
 
-        res = b.run(log=True, on_step=grab, timeout=args.timeout, record=record)
+        res = b.run(log=True, on_step=grab, timeout=args.timeout, record=record,
+                    start_phase=start_phase, seed_pair=seed_pair)
         for _ in range(300):
             mujoco.mj_step(sc.m, sc.d)
         r, bl = sc.d.xpos[sc.body["red"]], sc.d.xpos[sc.body["blue"]]

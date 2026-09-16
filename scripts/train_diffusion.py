@@ -126,17 +126,34 @@ class DiffusionPolicy(nn.Module):
         return a
 
 
-def windows(data, n_obs, horizon):
-    """Chunk each episode into (obs history, future actions) pairs."""
-    obs, act, ep = data["obs"], data["action"], data["episode"]
-    O, A = [], []
-    for e in np.unique(ep):
-        sel = np.flatnonzero(ep == e)
-        o, a = obs[sel], act[sel]
-        for i in range(n_obs - 1, len(sel) - horizon):
+def windows(data, n_obs, horizon, phases=None):
+    """Chunk each episode into (obs history, future actions) pairs.
+
+    `phases` keeps only part of each episode. Training on `stack` alone is the
+    usual choice: bracing and the feel sweep are a fixed sensing routine the
+    runner still performs, and what is worth learning is the fifteen seconds
+    after them.
+    """
+    obs, act, ep, ph = data["obs"], data["action"], data["episode"], data["phase"]
+    keep = np.isin(ph, list(phases)) if phases else np.ones(len(ep), bool)
+    idx = np.flatnonzero(keep)
+    if not len(idx):
+        raise SystemExit(f"no samples in phases {phases}")
+    # Break at every discontinuity, not just at episode boundaries. A failed
+    # grasp sends the demonstrator back to the feel sweep, so one episode's
+    # `stack` samples come in two or three separate runs; a window straddling
+    # the gap would teach a jump that never happened.
+    cut = np.flatnonzero((np.diff(idx) != 1) | (np.diff(ep[idx]) != 0)) + 1
+    O, A, owner = [], [], []
+    for run in np.split(idx, cut):
+        if len(run) < n_obs + horizon:
+            continue
+        o, a = obs[run], act[run]
+        for i in range(n_obs - 1, len(run) - horizon):
             O.append(o[i - n_obs + 1:i + 1])
             A.append(a[i:i + horizon])
-    return np.stack(O), np.stack(A)
+            owner.append(int(ep[run[0]]))
+    return np.stack(O), np.stack(A), np.array(owner)
 
 
 def main() -> int:
@@ -152,19 +169,34 @@ def main() -> int:
     ap.add_argument("--width", type=int, default=512)
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--phases", nargs="*", default=["stack"],
+                    help="outer phases to train on; empty for all")
+    ap.add_argument("--val-frac", type=float, default=0.1)
     args = ap.parse_args()
 
     torch.manual_seed(args.seed)
     data = np.load(args.dataset, allow_pickle=False)
-    O, A = windows(data, args.n_obs, args.horizon)
-    print(f"{len(O)} windows from {len(np.unique(data['episode']))} episodes; "
+    O, A, owner = windows(data, args.n_obs, args.horizon, args.phases)
+    eps = np.unique(owner)
+    # Hold out whole EPISODES. Splitting windows at random leaks: consecutive
+    # windows overlap by all but one frame, so a random split scores the model
+    # on data it has all but memorised.
+    rs = np.random.default_rng(args.seed)
+    val_eps = set(rs.permutation(eps)[:max(1, int(len(eps) * args.val_frac))].tolist())
+    is_val = np.array([o in val_eps for o in owner])
+    print(f"{len(O)} windows from {len(eps)} episodes ({len(val_eps)} held out); "
           f"obs {O.shape[-1]}, action {A.shape[-1]}, horizon {args.horizon}")
 
-    o_mu, o_sd = O.reshape(-1, O.shape[-1]).mean(0), O.reshape(-1, O.shape[-1]).std(0) + 1e-6
-    a_mu, a_sd = A.reshape(-1, A.shape[-1]).mean(0), A.reshape(-1, A.shape[-1]).std(0) + 1e-6
+    tr = ~is_val
+    o_flat = O[tr].reshape(-1, O.shape[-1])
+    a_flat = A[tr].reshape(-1, A.shape[-1])
+    o_mu, o_sd = o_flat.mean(0), o_flat.std(0) + 1e-6
+    a_mu, a_sd = a_flat.mean(0), a_flat.std(0) + 1e-6
     dev = torch.device(args.device)
-    Ot = torch.tensor((O - o_mu) / o_sd, dtype=torch.float32, device=dev)
-    At = torch.tensor((A - a_mu) / a_sd, dtype=torch.float32, device=dev)
+    Ot = torch.tensor((O[tr] - o_mu) / o_sd, dtype=torch.float32, device=dev)
+    At = torch.tensor((A[tr] - a_mu) / a_sd, dtype=torch.float32, device=dev)
+    Ov = torch.tensor((O[is_val] - o_mu) / o_sd, dtype=torch.float32, device=dev)
+    Av = torch.tensor((A[is_val] - a_mu) / a_sd, dtype=torch.float32, device=dev)
 
     net = DiffusionPolicy(O.shape[-1], A.shape[-1], args.n_obs, args.horizon,
                           args.steps, args.width).to(dev)
@@ -197,15 +229,21 @@ def main() -> int:
     }, args.out)
     print(f"wrote {args.out}")
 
-    # One honest sanity check before anyone trusts this: sample a chunk for a
-    # held-out window and see how far it lands from what the script actually did.
-    with torch.no_grad():
-        idx = torch.randperm(n)[:256].to(dev)
-        pred = net.act(Ot[idx]).cpu().numpy() * a_sd + a_mu
-        true = At[idx].cpu().numpy() * a_sd + a_mu
-    err = np.abs(pred - true)
-    print(f"sampled chunk error vs the demonstrator: median {np.median(err) * 1000:.2f} mrad, "
-          f"p90 {np.percentile(err, 90) * 1000:.2f} mrad")
+    # One honest check before anyone trusts this: sample chunks for HELD-OUT
+    # episodes and see how far they land from what the script actually did.
+    # Open-loop error is not the same as stacking a cube -- eval_diffusion.py
+    # rolls it out for that -- but a model that cannot match the demonstrator
+    # on data it has never seen is not going to.
+    for label, Os, As in (("train", Ot, At), ("held out", Ov, Av)):
+        if not len(Os):
+            continue
+        with torch.no_grad():
+            idx = torch.randperm(len(Os))[:256].to(dev)
+            pred = net.act(Os[idx]).cpu().numpy() * a_sd + a_mu
+            true = As[idx].cpu().numpy() * a_sd + a_mu
+        err = np.abs(pred - true)
+        print(f"  {label:9s} chunk error: median {np.median(err) * 1000:6.2f} mrad, "
+              f"p90 {np.percentile(err, 90):6.3f} rad")
     return 0
 
 

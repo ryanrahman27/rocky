@@ -56,9 +56,18 @@ def layout(rng, args):
     if args.cubes is not None:
         rx, ry, bx, by = args.cubes
         return np.array([rx, ry]), np.array([bx, by])
-    sep = rng.uniform(0.115, 0.150)
-    bearing = rng.uniform(-math.radians(12.0), math.radians(12.0))
-    R = rng.uniform(0.340, 0.380)
+    if getattr(args, "wide", False):
+        # Wider than the success envelope on purpose. A policy trained only on
+        # layouts the script handles comfortably has never seen the edge of the
+        # workspace, which is exactly where it will end up the first time it
+        # drifts.
+        sep = rng.uniform(0.100, 0.165)
+        bearing = rng.uniform(-math.radians(18.0), math.radians(18.0))
+        R = rng.uniform(0.320, 0.400)
+    else:
+        sep = rng.uniform(0.115, 0.150)
+        bearing = rng.uniform(-math.radians(12.0), math.radians(12.0))
+        R = rng.uniform(0.340, 0.380)
     d = sep / (2.0 * R)
     return (np.array([R * math.cos(bearing + d), R * math.sin(bearing + d)]),
             np.array([R * math.cos(bearing - d), R * math.sin(bearing - d)]))
