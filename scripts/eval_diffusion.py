@@ -42,10 +42,47 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from rocky import arm                                             # noqa: E402
+from rocky.approach import spawn_pose                             # noqa: E402
 from rocky.sonar import observation                               # noqa: E402
 from blind_stack_demo import Blind, parked_pose, CONTROL_HZ       # noqa: E402
 from stack_demo import Scene, gait_joints, layout                 # noqa: E402
 from train_diffusion import load_policy                           # noqa: E402
+
+
+class Film:
+    """Streams frames straight to the encoder, cutting cameras at the handover.
+
+    Buffering a full-pipeline episode is two gigabytes of uint8 -- 70 seconds at
+    30 fps and 960x720 -- so the frames go to ffmpeg as they are rendered. The
+    rangefinder rays draw as lines, which looks like what it is and compresses
+    like static, hence the crf.
+    """
+
+    def __init__(self, model, path, fps, width, height):
+        import imageio.v2 as imageio
+
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        self.ren = mujoco.Renderer(model, height=height, width=width)
+        self.writer = imageio.get_writer(
+            path, fps=fps, codec="libx264", pixelformat="yuv420p",
+            output_params=["-crf", "28", "-preset", "slow"])
+        self.fps, self.next, self.n = fps, 0.0, 0
+
+    def maybe(self, sc, t, phase):
+        if t < self.next:
+            return
+        self.next = t + 1.0 / self.fps
+        # Three shots: wide while it crosses the room, medium over the brace
+        # and the feel sweep, then tight on the hand for the pick and place,
+        # which is the part that is actually being driven by the policy.
+        cam = ("scene" if phase in ("listen", "walk")
+               else "hand" if phase == "stack" else "closeup")
+        self.ren.update_scene(sc.d, camera=cam)
+        self.writer.append_data(self.ren.render())
+        self.n += 1
+
+    def close(self):
+        self.writer.close()
 
 
 class Runner:
@@ -82,25 +119,41 @@ class Runner:
         return a
 
 
-def episode(args, rng, runner, renderer=None, frames=None):
+def episode(args, rng, runner, film_path=None):
+    """One episode; `film_path` records it, otherwise it runs headless."""
     sc = Scene()
     red, blue = layout(rng, args)
-    base_xy, yaw, seed = parked_pose(rng, red, blue)
     b = Blind(sc)
+    film = None if film_path is None else Film(sc.m, film_path, args.fps,
+                                               args.width, args.height)
+
+    if args.walk_in:
+        # The whole thing: find the cubes, walk to them, brace, feel, then hand
+        # over. The locomotion here is the analytic gait -- the trained walking
+        # policy plugs into the same twist, it just is not in this container.
+        base_xy, yaw = spawn_pose(rng, (np.array(red) + np.array(blue)) / 2.0)
+        seed, start, timeout = None, "listen", args.walk_timeout
+    else:
+        base_xy, yaw, seed = parked_pose(rng, red, blue)
+        start, timeout = "brace", args.perception_timeout
+
     sc.reset(b.gait.neutral_joint_targets(), base_xy, yaw, red, blue)
     for _ in range(300):
         sc.apply(gait_joints(b.gait, 0.0, 0.0, 0.0, 0.0))
         mujoco.mj_step(sc.m, sc.d)
 
-    # --- scripted half: brace, lift, feel ---------------------------------
-    handover = {}
-
-    def watch(t, phase, joints):
-        if phase == "stack" and "t" not in handover:
-            handover["t"] = t
-
-    b.run(timeout=args.perception_timeout, on_step=watch,
-          start_phase="brace", seed_pair=seed, stop_at="stack")
+    # --- scripted half: search, approach, brace, feel ----------------------
+    watch = None if film is None else (lambda t, phase, joints: film.maybe(sc, t, phase))
+    res = b.run(timeout=timeout, on_step=watch,
+                start_phase=start, seed_pair=seed, stop_at="stack")
+    if res["phase"] != "stack":
+        # Never found them, or never got parked. Not the policy's fault, and
+        # scoring it as a manipulation failure would be dishonest.
+        if film is not None:
+            film.close()
+        return dict(dz=0.0, dxy=9.99, stacked=False, on_top=False, lifted=False,
+                    reached=False, walk_s=res["t"])
+    walk_s = res["t"]
 
     # --- learned half ------------------------------------------------------
     runner.reset()
@@ -110,7 +163,6 @@ def episode(args, rng, runner, renderer=None, frames=None):
     joints = dict(b.last_joints)
     names = sc.names
     steps = int(args.seconds / dt)
-    nxt = 0.0
     for i in range(steps):
         if i % n_ctrl == 0:
             obs = observation(b.sonar, sc.d, sc.qadr, names, b.belief)
@@ -126,13 +178,16 @@ def episode(args, rng, runner, renderer=None, frames=None):
         wz, v = b.imu()
         b.belief[:2] = _carry(b.belief[:2], dt, wz, v)
         b.belief[2:] = _carry(b.belief[2:], dt, wz, v)
-        if renderer is not None and i * dt >= nxt:
-            nxt += 1.0 / args.fps
-            renderer.update_scene(sc.d, camera="closeup")
-            frames.append(renderer.render().copy())
+        if film is not None:
+            film.maybe(sc, walk_s + i * dt, "stack")
 
-    for _ in range(300):
+    for i in range(300):
         mujoco.mj_step(sc.m, sc.d)
+        if film is not None:
+            film.maybe(sc, walk_s + args.seconds + i * dt, "stack")
+    if film is not None:
+        film.close()
+        print(f"  wrote {film_path} ({film.n} frames)")
     r, bl = sc.d.xpos[sc.body["red"]], sc.d.xpos[sc.body["blue"]]
     dz, dxy = float(r[2] - bl[2]), float(np.hypot(*(r[:2] - bl[:2])))
     return dict(dz=dz, dxy=dxy,
@@ -143,7 +198,7 @@ def episode(args, rng, runner, renderer=None, frames=None):
                 # about whether the policy can do the task.
                 stacked=abs(dz - arm.CUBE) < 0.006 and dxy < 0.014,
                 on_top=abs(dz - arm.CUBE) < 0.008 and dxy < 0.020,
-                lifted=dz > 0.015)
+                lifted=dz > 0.015, reached=True, walk_s=walk_s)
 
 
 def _carry(p, dt, wz, v):
@@ -164,47 +219,46 @@ def main() -> int:
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--video", default=None)
     ap.add_argument("--fps", type=int, default=30)
+    ap.add_argument("--width", type=int, default=960)
+    ap.add_argument("--height", type=int, default=720)
+    ap.add_argument("--walk-in", action="store_true",
+                    help="run the whole thing: search, approach, feel, then the policy")
+    ap.add_argument("--walk-timeout", type=float, default=110.0)
+    ap.add_argument("--torch-seed", type=int, default=0,
+                    help="the sampler draws noise; fix it so a good episode can be re-filmed")
     ap.add_argument("--wide", action="store_true")
     ap.add_argument("--cubes", type=float, nargs=4, default=None)
     args = ap.parse_args()
 
+    torch.manual_seed(args.torch_seed)
     net, ck = load_policy(args.checkpoint, args.device)
     runner = Runner(net, ck, args.n_action, args.device)
     rng = np.random.default_rng(args.seed)
-    frames = [] if args.video else None
-    renderer = None
-
-    ok = lifted = on_top = 0
+    ok = lifted = on_top = reached = 0
     offsets = []
     for ep in range(args.episodes):
-        ren = None
-        if args.video and ep == 0:
-            renderer = mujoco.Renderer(Scene().m, height=720, width=960)
-            ren = renderer
-        res = episode(args, rng, runner, ren, frames)
+        res = episode(args, rng, runner, args.video if ep == 0 else None)
         ok += res["stacked"]
         on_top += res["on_top"]
         lifted += res["lifted"]
+        reached += res["reached"]
         if res["on_top"]:
             offsets.append(res["dxy"] * 1000)
-        verdict = ("stacked" if res["stacked"] else
+        verdict = ("never reached the cubes" if not res["reached"] else
+                   "stacked" if res["stacked"] else
                    "on top " if res["on_top"] else
                    "dropped" if res["lifted"] else "no grasp")
-        print(f"  ep {ep:3d}  dz {res['dz'] * 1000:6.1f} mm  dxy {res['dxy'] * 1000:6.1f} mm  "
-              f"{verdict}", flush=True)
+        walk = f"walk {res['walk_s']:5.1f}s  " if args.walk_in else ""
+        print(f"  ep {ep:3d}  {walk}dz {res['dz'] * 1000:6.1f} mm  "
+              f"dxy {res['dxy'] * 1000:6.1f} mm  {verdict}", flush=True)
     n = args.episodes
-    print(f"\n{on_top}/{n} on top and supported, {ok}/{n} inside the strict 14 mm, "
+    if args.walk_in:
+        print(f"\n{reached}/{n} reached the cubes")
+    print(f"{on_top}/{n} on top and supported, {ok}/{n} inside the strict 14 mm, "
           f"{lifted}/{n} got the cube off the floor")
     if offsets:
         print(f"when it lands: offset median {np.median(offsets):.1f} mm, "
               f"worst {max(offsets):.1f} mm")
-
-    if args.video and frames:
-        import imageio.v2 as imageio
-        Path(args.video).parent.mkdir(parents=True, exist_ok=True)
-        imageio.mimsave(args.video, frames, fps=args.fps, codec="libx264",
-                        output_params=["-crf", "30", "-preset", "slow"], pixelformat="yuv420p")
-        print(f"wrote {args.video}")
     return 0
 
 

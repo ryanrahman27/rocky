@@ -49,6 +49,9 @@
     <!-- Keeps the robot centred however it parks; scripts/stack_demo.py cuts to
          this one at the handoff, where all the interesting motion is. -->
     <camera name="closeup" mode="targetbody" target="base" pos="0.78 -0.52 0.36" fovy="50"/>
+    <!-- Tracks the hand rather than the body, so the grasp stays centred
+         instead of sitting in the corner while the carapace fills the frame. -->
+    <camera name="hand" mode="targetbody" target="gripper_0" pos="0.72 -0.46 0.30" fovy="46"/>
   </worldbody>
 
   <!-- Leg 0's foot sphere is a walking geom sitting between the open jaws. It
