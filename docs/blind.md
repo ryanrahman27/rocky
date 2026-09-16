@@ -1,0 +1,151 @@
+# Blind: stacking by sound and touch
+
+Rocky has no eyes. Eridians perceive shape by sound — it is why he could never
+see the stars, and why everything he and Grace exchanged had to be handed over
+physically rather than pointed at. Taking that seriously means the robot gets no
+camera at all, and with it goes the case for a vision-language policy: there is
+no image to condition on. What is left is a ring of rangefinders standing in for
+the sonar, the joint encoders, an IMU, and two touch pads.
+
+`scripts/blind_stack_demo.py` runs the whole task on that and nothing else. No
+part of it reads a cube's true pose.
+
+## Where the emitters had to go
+
+This was decided entirely by the body plan, and it took three tries.
+
+**Over the body axis.** The elevation needed to see something at arm's length is
+steep enough that the ray hits the robot's own shoulder on the way out. Measured:
+a 20° cone straight ahead came back at 0.11 m — the coxa — in *every* gait phase,
+including the one where the front limb is airborne, because the coxa never leaves
+that azimuth.
+
+**On the carapace rim.** Clears the coxa, and buries the emitters inside the
+femur instead.
+
+**In the gaps.** What is actually true is that a limb blocks about 12° either
+side of its own azimuth and no mounting changes that — the same problem a real
+legged robot has with a body lidar. So the emitters live in the five gaps between
+the limbs: 45 bearings, 5° apart, 40° of coverage per gap, six elevation bands
+each. 270 rays, and over an empty floor every one of them reads clean.
+
+The bands are a ladder in range. With the emitter ~120 mm above the floor and the
+target *d* further out, a 40 mm cube shows up when tan(depression) falls between
+(0.12−0.04)/d and 0.12/d, so 5°, 8°, 12°, 17°, 23° and 30° cover roughly 1.3,
+0.85, 0.55, 0.40, 0.31 and 0.25 m from the body axis.
+
+## Why the robot walks sideways
+
+It follows from the gaps. Facing the cubes squarely puts them behind the front
+limb, where nothing can be heard. So the approach controller holds them **36° off
+the body axis** — the gap centre — and closes crabwise, which the wave gait does
+perfectly well since it has lateral velocity. Inside 0.55 m it drops the crab and
+squares up for the arm, the cubes go quiet, and the belief coasts on IMU dead
+reckoning until the gripper takes over.
+
+That is not a trick to make the demo work. It is what this body plan has to do to
+watch where it is going, and it is the single most alien-looking thing the robot
+does.
+
+## The estimator
+
+`src/rocky/sonar.py`, and deliberately plain:
+
+1. Most rays hit the floor, so **the floor tells you how high you are**. Every
+   ray that lands on flat ground implies the same plane offset; the median over
+   the ring is it. No state estimator required.
+2. A ray that comes back **shorter than the floor would be** is touching
+   something. Convert it to a point in the body frame.
+3. **Single-link cluster** those points. Each cluster is an object, and a cluster
+   wider than 75 mm is two cubes that happened to link, so it gets split.
+
+Three things this got wrong first, each of which cost an episode to find:
+
+**The IMU is not optional.** A ray 5° below horizontal reaches the floor 1.4 m
+away, and 2° of body pitch — which the wave gait produces every stride — moves
+that by more than half a metre. Predicting the floor as if the robot were level
+makes the shallow bands report a phantom object at about a metre on whichever
+side it happens to be leaning. The tracker locked onto it and walked away from
+the cubes for the entire episode. The floor plane is now fitted against the IMU's
+own up-vector.
+
+**A swinging leg goes through the gap.** The emitters are clear at the neutral
+stance, which is what the first check tested, but a limb in swing travels right
+across the beams. The robot knows where its own limbs are — `limb_points` takes
+the joint encoders and returns every knee and foot — and hits within 85 mm of one
+are discarded.
+
+**One ray is a rumour.** A cube at three quarters of a metre lights up exactly
+one ray, and so does a foot about to land. `PairTracker` accumulates evidence
+across pings and only promotes a candidate once it has been in the same place
+more than once. The decay on that evidence is the parameter that matters: at
+long range a cube is heard on perhaps one ping in three, and evidence that halves
+in a quarter of a second never reaches the bar however long you wait — a
+candidate hit every third ping settles at 1.7 against a threshold of 2.5, and
+seven episodes out of twelve spent their entire time searching a room with two
+cubes plainly in it.
+
+Measured, with the robot standing still: bearing RMS **0.76°** (worst 1.5°, which
+is 12 mm at 0.45 m), range error under 25 mm, and both cubes resolved as a pair in
+16 of 16 layouts from 0.32 to 0.60 m.
+
+## Searching
+
+The sonar reaches about 1.3 m and the robot spawns up to 1.2 m from the cubes, so
+the first thing it usually has to do is find them. Two attempts at that failed
+for reasons worth writing down:
+
+- **Turning and creeping at once** traces a circle of radius v/ω, which at these
+  rates is 60 mm. The robot appears to be searching and is standing still.
+- **Alternating turn and walk legs** is a random walk: the walking leg goes
+  wherever the last turn happened to leave it pointing, and over 35 s it covers
+  almost no ground.
+
+What works is cruising straight ahead while yawing back and forth — closing the
+range and sweeping the gaps across the room at the same time. With that, 11 of 12
+spawns acquire both cubes within 10 to 20 seconds. If only one is ever heard, the
+robot walks up to that one anyway after 16 seconds and lets the hand sort out
+what is actually there.
+
+## Feeling for the grasp
+
+The ring gets the robot parked. It cannot do the grasp: squared up, the cubes are
+in the front limb's shadow.
+
+So the arm becomes the sensor. Five more rangefinders fan out from the gripper —
+from **beyond** the fingertips, because fired from inside the hand every one of
+them lands on the robot's own foot sphere at 38 mm and never sees anything else.
+The brace lifts leg 0, the arm sweeps 60° across the front at about 26°/s, and
+hits that stand proud of the sonar-estimated floor are clustered into two cubes.
+
+Measured against ground truth: **4–6 mm**, which is better than the ring by an
+order of magnitude and good enough to grasp on.
+
+## Knowing whether it worked
+
+A blind robot's only way of telling whether it actually picked the cube up is the
+pads. Both loaded means something is between the fingers; one alone means it
+shoved the cube instead of taking it. The demonstrator checks halfway through the
+lift, and on a miss it re-runs the feel sweep and tries again rather than
+carefully stacking nothing on nothing.
+
+That check is also why this task is worth training a policy on. The scripted
+version knows the cube is there because it just measured it. A learned one has to
+decide, from the same signals, whether to close now or feel around some more.
+
+## What a policy sees
+
+No images anywhere:
+
+| | size | |
+|---|---|---|
+| sonar ring residual | 270 | metres nearer than bare floor, per ray |
+| gripper fan | 5 | metres |
+| touch | 2 | newtons per pad |
+| joint positions | 18 | rad, m for the jaws |
+| joint velocities | 18 | |
+| IMU | 6 | gyro and up-vector |
+
+About 320 floats — smaller than a single 16×16 image patch, and every one of
+them is something the hardware would actually have. A state-only diffusion policy
+over this is small enough to train in minutes.

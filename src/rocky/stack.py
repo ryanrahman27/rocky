@@ -46,6 +46,12 @@ def _smoothstep(s: float) -> float:
     return s * s * (3.0 - 2.0 * s)
 
 
+def _carry_xy(p: np.ndarray, dt: float, wz: float, v) -> np.ndarray:
+    c, s = math.cos(-wz * dt), math.sin(-wz * dt)
+    return (np.array([c * p[0] - s * p[1], s * p[0] + c * p[1]])
+            - np.asarray(v, float)[:2] * dt)
+
+
 def _quat_to_mat(q) -> np.ndarray:
     w, x, y, z = (float(v) for v in q)
     return np.array([
@@ -177,8 +183,18 @@ class StackController:
         return K.inverse_kinematics(P.MANIP_LEG, K.body_to_leg(P.MANIP_LEG, centre))
 
     # -- episode setup -----------------------------------------------------
-    def reset(self, red_xy, blue_xy, floor_z: float = 0.0) -> None:
-        """Latch the cube positions for this episode. World frame, metres."""
+    def reset(self, red_xy, blue_xy, floor_z: float = 0.0, frame: str = "world") -> None:
+        """Latch the cube positions for this episode, in metres.
+
+        `frame` is "world" when something outside the robot knows where the
+        cubes are, and "body" when the only thing that knows is the robot --
+        which is the case once the cameras come off and the sonar is all there
+        is. In body frame the waypoints ride with the robot, so `carry` has to
+        be called every tick to dead-reckon them as it shifts underneath.
+        """
+        if frame not in ("world", "body"):
+            raise ValueError(f"frame must be world or body, got {frame!r}")
+        self.frame = frame
         self.red = np.array([float(red_xy[0]), float(red_xy[1]), floor_z + arm.CUBE / 2])
         self.blue = np.array([float(blue_xy[0]), float(blue_xy[1]), floor_z + arm.CUBE / 2])
         self.floor_z = float(floor_z)
@@ -222,12 +238,36 @@ class StackController:
             ("stow",     p.t_stow,     "fold",  (ready, p.stow_gap)),
         ]
 
+    def carry(self, dt: float, ang_vel_z: float, lin_vel) -> None:
+        """Dead-reckon body-frame waypoints as the body moves under them.
+
+        The brace holds station but it does not hold still: measured, the base
+        creeps 10-20 mm over a stacking sequence. With a world-frame target the
+        base pose absorbs that; with only the robot's own senses, the IMU has to.
+        """
+        if self.frame != "body":
+            return
+        for name in ("red", "blue"):
+            p = getattr(self, name)
+            p[:2] = _carry_xy(p[:2], dt, ang_vel_z, lin_vel)
+        self._approach_cache.clear()
+        self._segments = self._build()
+
+    def time_of(self, phase: str) -> float:
+        """When a named phase begins. Lets a runner restart part-way through."""
+        t = 0.0
+        for name, dur, _, _ in self._segments:
+            if name == phase:
+                return t
+            t += dur
+        raise KeyError(phase)
+
     @property
     def duration(self) -> float:
         return self._total
 
     # -- the sequence ------------------------------------------------------
-    def step(self, t: float, base_pos, base_quat, arm_q=None) -> Step:
+    def step(self, t: float, base_pos=None, base_quat=None, arm_q=None) -> Step:
         """One control tick.
 
         `arm_q` is the measured (sweep, lift, elbow, wrist) of leg 0. Supply it
@@ -235,12 +275,20 @@ class StackController:
         it out and the sequence runs purely open-loop on the joints.
         """
         name, s, mode, payload = self._locate(t)
-        R = _quat_to_mat(base_quat)
-        origin = np.asarray(base_pos, float)
+        if self.frame == "body":
+            # Nothing outside the robot is telling it where it is, so there is
+            # no base pose to transform with; the waypoints are already in the
+            # frame the robot thinks in.
+            R, origin = np.eye(3), np.zeros(3)
+        else:
+            R = _quat_to_mat(base_quat)
+            origin = np.asarray(base_pos, float)
 
         def body(wp):
             frame, pt = wp
-            return np.asarray(pt, float) if frame == BODY else R.T @ (np.asarray(pt, float) - origin)
+            if frame == BODY or self.frame == "body":
+                return np.asarray(pt, float)
+            return R.T @ (np.asarray(pt, float) - origin)
 
         legs = self.brace_stance.copy()
         stance_q = np.append(self.brace_stance[P.MANIP_LEG], P.HOME_WRIST)

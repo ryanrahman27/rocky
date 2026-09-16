@@ -11,3 +11,6 @@ wandb/
 *.gif
 !docs/*.gif
 .DS_Store
+out/
+__pycache__/
+*.pyc

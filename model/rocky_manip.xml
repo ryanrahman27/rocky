@@ -72,6 +72,276 @@
       <inertial pos="0.0001749761 -0.0000434770 0.0527797235" mass="1.3323345375" fullinertia="0.00563132765455 0.00617944523274 0.00885178962494 1.18792858478e-05 6.73435054842e-06 -3.19068712785e-06"/>
       <site name="imu" pos="0 0 0.0125" size="0.005" group="4"/>
       <camera name="head" pos="0.020 0 0.245" xyaxes="0 -1 0 0.707 0 0.707" fovy="68"/>
+      <site name="sonar_00_0" pos="0.144189 0.041346 0.0600" zaxis="0.957604 0.274588 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_00_1" pos="0.144189 0.041346 0.0600" zaxis="0.951907 0.272955 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_00_2" pos="0.144189 0.041346 0.0600" zaxis="0.940256 0.269614 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_00_3" pos="0.144189 0.041346 0.0600" zaxis="0.919259 0.263593 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_00_4" pos="0.144189 0.041346 0.0600" zaxis="0.884846 0.253726 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_00_5" pos="0.144189 0.041346 0.0600" zaxis="0.832477 0.238709 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_01_0" pos="0.140037 0.053755 0.0600" zaxis="0.930028 0.357004 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_01_1" pos="0.140037 0.053755 0.0600" zaxis="0.924495 0.354880 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_01_2" pos="0.140037 0.053755 0.0600" zaxis="0.913179 0.350537 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_01_3" pos="0.140037 0.053755 0.0600" zaxis="0.892787 0.342709 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_01_4" pos="0.140037 0.053755 0.0600" zaxis="0.859365 0.329879 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_01_5" pos="0.140037 0.053755 0.0600" zaxis="0.808504 0.310356 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_02_0" pos="0.134819 0.065756 0.0600" zaxis="0.895374 0.436703 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_02_1" pos="0.134819 0.065756 0.0600" zaxis="0.890047 0.434105 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_02_2" pos="0.134819 0.065756 0.0600" zaxis="0.879153 0.428792 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_02_3" pos="0.134819 0.065756 0.0600" zaxis="0.859521 0.419216 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_02_4" pos="0.134819 0.065756 0.0600" zaxis="0.827344 0.403523 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_02_5" pos="0.134819 0.065756 0.0600" zaxis="0.778378 0.379641 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_03_0" pos="0.128575 0.077256 0.0600" zaxis="0.853906 0.513078 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_03_1" pos="0.128575 0.077256 0.0600" zaxis="0.848825 0.510026 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_03_2" pos="0.128575 0.077256 0.0600" zaxis="0.838436 0.503783 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_03_3" pos="0.128575 0.077256 0.0600" zaxis="0.819713 0.492533 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_03_4" pos="0.128575 0.077256 0.0600" zaxis="0.789027 0.474095 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_03_5" pos="0.128575 0.077256 0.0600" zaxis="0.742329 0.446036 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_04_0" pos="0.121353 0.088168 0.0600" zaxis="0.805938 0.585549 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_04_1" pos="0.121353 0.088168 0.0600" zaxis="0.801144 0.582065 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_04_2" pos="0.121353 0.088168 0.0600" zaxis="0.791338 0.574941 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_04_3" pos="0.121353 0.088168 0.0600" zaxis="0.773667 0.562102 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_04_4" pos="0.121353 0.088168 0.0600" zaxis="0.744704 0.541059 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_04_5" pos="0.121353 0.088168 0.0600" zaxis="0.700629 0.509037 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_05_0" pos="0.113206 0.098409 0.0600" zaxis="0.751838 0.653563 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_05_1" pos="0.113206 0.098409 0.0600" zaxis="0.747365 0.649674 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_05_2" pos="0.113206 0.098409 0.0600" zaxis="0.738217 0.641723 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_05_3" pos="0.113206 0.098409 0.0600" zaxis="0.721732 0.627392 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_05_4" pos="0.113206 0.098409 0.0600" zaxis="0.694714 0.603906 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_05_5" pos="0.113206 0.098409 0.0600" zaxis="0.653598 0.568164 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_06_0" pos="0.104199 0.107901 0.0600" zaxis="0.692015 0.716602 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_06_1" pos="0.104199 0.107901 0.0600" zaxis="0.687898 0.712339 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_06_2" pos="0.104199 0.107901 0.0600" zaxis="0.679478 0.703620 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_06_3" pos="0.104199 0.107901 0.0600" zaxis="0.664305 0.687908 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_06_4" pos="0.104199 0.107901 0.0600" zaxis="0.639436 0.662156 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_06_5" pos="0.104199 0.107901 0.0600" zaxis="0.601592 0.622967 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_07_0" pos="0.094398 0.116572 0.0600" zaxis="0.626926 0.774189 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_07_1" pos="0.094398 0.116572 0.0600" zaxis="0.623196 0.769583 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_07_2" pos="0.094398 0.116572 0.0600" zaxis="0.615568 0.760163 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_07_3" pos="0.094398 0.116572 0.0600" zaxis="0.601822 0.743188 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_07_4" pos="0.094398 0.116572 0.0600" zaxis="0.579292 0.715367 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_07_5" pos="0.094398 0.116572 0.0600" zaxis="0.545007 0.673028 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_08_0" pos="0.083879 0.124356 0.0600" zaxis="0.557065 0.825883 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_08_1" pos="0.083879 0.124356 0.0600" zaxis="0.553751 0.820969 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_08_2" pos="0.083879 0.124356 0.0600" zaxis="0.546973 0.810921 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_08_3" pos="0.083879 0.124356 0.0600" zaxis="0.534759 0.792813 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_08_4" pos="0.083879 0.124356 0.0600" zaxis="0.514740 0.763133 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_08_5" pos="0.083879 0.124356 0.0600" zaxis="0.484275 0.717968 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_09_0" pos="0.005235 0.149909 0.0600" zaxis="0.034767 0.995588 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_09_1" pos="0.005235 0.149909 0.0600" zaxis="0.034560 0.989665 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_09_2" pos="0.005235 0.149909 0.0600" zaxis="0.034137 0.977552 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_09_3" pos="0.005235 0.149909 0.0600" zaxis="0.033375 0.955722 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_09_4" pos="0.005235 0.149909 0.0600" zaxis="0.032125 0.919944 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_09_5" pos="0.005235 0.149909 0.0600" zaxis="0.030224 0.865498 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_10_0" pos="-0.007850 0.149794 0.0600" zaxis="-0.052137 0.994829 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_10_1" pos="-0.007850 0.149794 0.0600" zaxis="-0.051827 0.988911 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_10_2" pos="-0.007850 0.149794 0.0600" zaxis="-0.051192 0.976807 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_10_3" pos="-0.007850 0.149794 0.0600" zaxis="-0.050049 0.954994 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_10_4" pos="-0.007850 0.149794 0.0600" zaxis="-0.048176 0.919243 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_10_5" pos="-0.007850 0.149794 0.0600" zaxis="-0.045324 0.864839 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_11_0" pos="-0.020876 0.148540 0.0600" zaxis="-0.138644 0.986500 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_11_1" pos="-0.020876 0.148540 0.0600" zaxis="-0.137819 0.980631 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_11_2" pos="-0.020876 0.148540 0.0600" zaxis="-0.136132 0.968628 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_11_3" pos="-0.020876 0.148540 0.0600" zaxis="-0.133092 0.946998 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_11_4" pos="-0.020876 0.148540 0.0600" zaxis="-0.128110 0.911547 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_11_5" pos="-0.020876 0.148540 0.0600" zaxis="-0.120527 0.857597 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_12_0" pos="-0.033743 0.146156 0.0600" zaxis="-0.224095 0.970662 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_12_1" pos="-0.033743 0.146156 0.0600" zaxis="-0.222762 0.964888 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_12_2" pos="-0.033743 0.146156 0.0600" zaxis="-0.220035 0.953078 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_12_3" pos="-0.033743 0.146156 0.0600" zaxis="-0.215122 0.931795 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_12_4" pos="-0.033743 0.146156 0.0600" zaxis="-0.207069 0.896912 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_12_5" pos="-0.033743 0.146156 0.0600" zaxis="-0.194813 0.843829 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_13_0" pos="-0.046353 0.142658 0.0600" zaxis="-0.307841 0.947437 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_13_1" pos="-0.046353 0.142658 0.0600" zaxis="-0.306010 0.941801 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_13_2" pos="-0.046353 0.142658 0.0600" zaxis="-0.302264 0.930274 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_13_3" pos="-0.046353 0.142658 0.0600" zaxis="-0.295514 0.909500 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_13_4" pos="-0.046353 0.142658 0.0600" zaxis="-0.284452 0.875452 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_13_5" pos="-0.046353 0.142658 0.0600" zaxis="-0.267617 0.823639 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_14_0" pos="-0.058610 0.138076 0.0600" zaxis="-0.389244 0.917002 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_14_1" pos="-0.058610 0.138076 0.0600" zaxis="-0.386929 0.911547 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_14_2" pos="-0.058610 0.138076 0.0600" zaxis="-0.382193 0.900390 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_14_3" pos="-0.058610 0.138076 0.0600" zaxis="-0.373658 0.880283 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_14_4" pos="-0.058610 0.138076 0.0600" zaxis="-0.359670 0.847329 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_14_5" pos="-0.058610 0.138076 0.0600" zaxis="-0.338383 0.797181 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_15_0" pos="-0.070421 0.132442 0.0600" zaxis="-0.467685 0.879588 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_15_1" pos="-0.070421 0.132442 0.0600" zaxis="-0.464903 0.874355 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_15_2" pos="-0.070421 0.132442 0.0600" zaxis="-0.459212 0.863653 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_15_3" pos="-0.070421 0.132442 0.0600" zaxis="-0.448958 0.844367 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_15_4" pos="-0.070421 0.132442 0.0600" zaxis="-0.432151 0.812758 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_15_5" pos="-0.070421 0.132442 0.0600" zaxis="-0.406574 0.764655 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_16_0" pos="-0.081696 0.125801 0.0600" zaxis="-0.542567 0.835479 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_16_1" pos="-0.081696 0.125801 0.0600" zaxis="-0.539339 0.830509 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_16_2" pos="-0.081696 0.125801 0.0600" zaxis="-0.532737 0.820344 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_16_3" pos="-0.081696 0.125801 0.0600" zaxis="-0.520841 0.802025 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_16_4" pos="-0.081696 0.125801 0.0600" zaxis="-0.501343 0.772000 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_16_5" pos="-0.081696 0.125801 0.0600" zaxis="-0.471671 0.726310 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_17_0" pos="-0.092349 0.118202 0.0600" zaxis="-0.613319 0.785012 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_17_1" pos="-0.092349 0.118202 0.0600" zaxis="-0.609670 0.780342 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_17_2" pos="-0.092349 0.118202 0.0600" zaxis="-0.602208 0.770791 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_17_3" pos="-0.092349 0.118202 0.0600" zaxis="-0.588760 0.753578 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_17_4" pos="-0.092349 0.118202 0.0600" zaxis="-0.566719 0.725368 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_17_5" pos="-0.092349 0.118202 0.0600" zaxis="-0.533178 0.682437 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_18_0" pos="-0.140954 0.051303 0.0600" zaxis="-0.936117 0.340719 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_18_1" pos="-0.140954 0.051303 0.0600" zaxis="-0.930548 0.338692 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_18_2" pos="-0.140954 0.051303 0.0600" zaxis="-0.919158 0.334546 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_18_3" pos="-0.140954 0.051303 0.0600" zaxis="-0.898633 0.327075 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_18_4" pos="-0.140954 0.051303 0.0600" zaxis="-0.864992 0.314831 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_18_5" pos="-0.140954 0.051303 0.0600" zaxis="-0.813798 0.296198 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_19_0" pos="-0.144889 0.038823 0.0600" zaxis="-0.962250 0.257834 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_19_1" pos="-0.144889 0.038823 0.0600" zaxis="-0.956526 0.256300 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_19_2" pos="-0.144889 0.038823 0.0600" zaxis="-0.944818 0.253163 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_19_3" pos="-0.144889 0.038823 0.0600" zaxis="-0.923719 0.247510 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_19_4" pos="-0.144889 0.038823 0.0600" zaxis="-0.889139 0.238244 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_19_5" pos="-0.144889 0.038823 0.0600" zaxis="-0.836516 0.224144 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_20_0" pos="-0.147721 0.026047 0.0600" zaxis="-0.981060 0.172987 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_20_1" pos="-0.147721 0.026047 0.0600" zaxis="-0.975224 0.171958 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_20_2" pos="-0.147721 0.026047 0.0600" zaxis="-0.963287 0.169854 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_20_3" pos="-0.147721 0.026047 0.0600" zaxis="-0.941776 0.166061 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_20_4" pos="-0.147721 0.026047 0.0600" zaxis="-0.906520 0.159844 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_20_5" pos="-0.147721 0.026047 0.0600" zaxis="-0.852869 0.150384 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_21_0" pos="-0.149429 0.013073 0.0600" zaxis="-0.992404 0.086824 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_21_1" pos="-0.149429 0.013073 0.0600" zaxis="-0.986500 0.086308 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_21_2" pos="-0.149429 0.013073 0.0600" zaxis="-0.974425 0.085251 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_21_3" pos="-0.149429 0.013073 0.0600" zaxis="-0.952666 0.083347 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_21_4" pos="-0.149429 0.013073 0.0600" zaxis="-0.917002 0.080227 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_21_5" pos="-0.149429 0.013073 0.0600" zaxis="-0.862730 0.075479 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_22_0" pos="-0.150000 0.000000 0.0600" zaxis="-0.996195 0.000000 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_22_1" pos="-0.150000 0.000000 0.0600" zaxis="-0.990268 0.000000 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_22_2" pos="-0.150000 0.000000 0.0600" zaxis="-0.978148 0.000000 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_22_3" pos="-0.150000 0.000000 0.0600" zaxis="-0.956305 0.000000 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_22_4" pos="-0.150000 0.000000 0.0600" zaxis="-0.920505 0.000000 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_22_5" pos="-0.150000 0.000000 0.0600" zaxis="-0.866025 0.000000 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_23_0" pos="-0.149429 -0.013073 0.0600" zaxis="-0.992404 -0.086824 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_23_1" pos="-0.149429 -0.013073 0.0600" zaxis="-0.986500 -0.086308 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_23_2" pos="-0.149429 -0.013073 0.0600" zaxis="-0.974425 -0.085251 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_23_3" pos="-0.149429 -0.013073 0.0600" zaxis="-0.952666 -0.083347 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_23_4" pos="-0.149429 -0.013073 0.0600" zaxis="-0.917002 -0.080227 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_23_5" pos="-0.149429 -0.013073 0.0600" zaxis="-0.862730 -0.075479 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_24_0" pos="-0.147721 -0.026047 0.0600" zaxis="-0.981060 -0.172987 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_24_1" pos="-0.147721 -0.026047 0.0600" zaxis="-0.975224 -0.171958 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_24_2" pos="-0.147721 -0.026047 0.0600" zaxis="-0.963287 -0.169854 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_24_3" pos="-0.147721 -0.026047 0.0600" zaxis="-0.941776 -0.166061 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_24_4" pos="-0.147721 -0.026047 0.0600" zaxis="-0.906520 -0.159844 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_24_5" pos="-0.147721 -0.026047 0.0600" zaxis="-0.852869 -0.150384 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_25_0" pos="-0.144889 -0.038823 0.0600" zaxis="-0.962250 -0.257834 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_25_1" pos="-0.144889 -0.038823 0.0600" zaxis="-0.956526 -0.256300 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_25_2" pos="-0.144889 -0.038823 0.0600" zaxis="-0.944818 -0.253163 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_25_3" pos="-0.144889 -0.038823 0.0600" zaxis="-0.923719 -0.247510 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_25_4" pos="-0.144889 -0.038823 0.0600" zaxis="-0.889139 -0.238244 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_25_5" pos="-0.144889 -0.038823 0.0600" zaxis="-0.836516 -0.224144 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_26_0" pos="-0.140954 -0.051303 0.0600" zaxis="-0.936117 -0.340719 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_26_1" pos="-0.140954 -0.051303 0.0600" zaxis="-0.930548 -0.338692 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_26_2" pos="-0.140954 -0.051303 0.0600" zaxis="-0.919158 -0.334546 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_26_3" pos="-0.140954 -0.051303 0.0600" zaxis="-0.898633 -0.327075 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_26_4" pos="-0.140954 -0.051303 0.0600" zaxis="-0.864992 -0.314831 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_26_5" pos="-0.140954 -0.051303 0.0600" zaxis="-0.813798 -0.296198 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_27_0" pos="-0.092349 -0.118202 0.0600" zaxis="-0.613319 -0.785012 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_27_1" pos="-0.092349 -0.118202 0.0600" zaxis="-0.609670 -0.780342 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_27_2" pos="-0.092349 -0.118202 0.0600" zaxis="-0.602208 -0.770791 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_27_3" pos="-0.092349 -0.118202 0.0600" zaxis="-0.588760 -0.753578 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_27_4" pos="-0.092349 -0.118202 0.0600" zaxis="-0.566719 -0.725368 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_27_5" pos="-0.092349 -0.118202 0.0600" zaxis="-0.533178 -0.682437 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_28_0" pos="-0.081696 -0.125801 0.0600" zaxis="-0.542567 -0.835479 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_28_1" pos="-0.081696 -0.125801 0.0600" zaxis="-0.539339 -0.830509 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_28_2" pos="-0.081696 -0.125801 0.0600" zaxis="-0.532737 -0.820344 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_28_3" pos="-0.081696 -0.125801 0.0600" zaxis="-0.520841 -0.802025 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_28_4" pos="-0.081696 -0.125801 0.0600" zaxis="-0.501343 -0.772000 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_28_5" pos="-0.081696 -0.125801 0.0600" zaxis="-0.471671 -0.726310 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_29_0" pos="-0.070421 -0.132442 0.0600" zaxis="-0.467685 -0.879588 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_29_1" pos="-0.070421 -0.132442 0.0600" zaxis="-0.464903 -0.874355 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_29_2" pos="-0.070421 -0.132442 0.0600" zaxis="-0.459212 -0.863653 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_29_3" pos="-0.070421 -0.132442 0.0600" zaxis="-0.448958 -0.844367 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_29_4" pos="-0.070421 -0.132442 0.0600" zaxis="-0.432151 -0.812758 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_29_5" pos="-0.070421 -0.132442 0.0600" zaxis="-0.406574 -0.764655 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_30_0" pos="-0.058610 -0.138076 0.0600" zaxis="-0.389244 -0.917002 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_30_1" pos="-0.058610 -0.138076 0.0600" zaxis="-0.386929 -0.911547 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_30_2" pos="-0.058610 -0.138076 0.0600" zaxis="-0.382193 -0.900390 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_30_3" pos="-0.058610 -0.138076 0.0600" zaxis="-0.373658 -0.880283 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_30_4" pos="-0.058610 -0.138076 0.0600" zaxis="-0.359670 -0.847329 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_30_5" pos="-0.058610 -0.138076 0.0600" zaxis="-0.338383 -0.797181 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_31_0" pos="-0.046353 -0.142658 0.0600" zaxis="-0.307841 -0.947437 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_31_1" pos="-0.046353 -0.142658 0.0600" zaxis="-0.306010 -0.941801 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_31_2" pos="-0.046353 -0.142658 0.0600" zaxis="-0.302264 -0.930274 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_31_3" pos="-0.046353 -0.142658 0.0600" zaxis="-0.295514 -0.909500 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_31_4" pos="-0.046353 -0.142658 0.0600" zaxis="-0.284452 -0.875452 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_31_5" pos="-0.046353 -0.142658 0.0600" zaxis="-0.267617 -0.823639 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_32_0" pos="-0.033743 -0.146156 0.0600" zaxis="-0.224095 -0.970662 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_32_1" pos="-0.033743 -0.146156 0.0600" zaxis="-0.222762 -0.964888 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_32_2" pos="-0.033743 -0.146156 0.0600" zaxis="-0.220035 -0.953078 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_32_3" pos="-0.033743 -0.146156 0.0600" zaxis="-0.215122 -0.931795 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_32_4" pos="-0.033743 -0.146156 0.0600" zaxis="-0.207069 -0.896912 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_32_5" pos="-0.033743 -0.146156 0.0600" zaxis="-0.194813 -0.843829 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_33_0" pos="-0.020876 -0.148540 0.0600" zaxis="-0.138644 -0.986500 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_33_1" pos="-0.020876 -0.148540 0.0600" zaxis="-0.137819 -0.980631 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_33_2" pos="-0.020876 -0.148540 0.0600" zaxis="-0.136132 -0.968628 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_33_3" pos="-0.020876 -0.148540 0.0600" zaxis="-0.133092 -0.946998 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_33_4" pos="-0.020876 -0.148540 0.0600" zaxis="-0.128110 -0.911547 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_33_5" pos="-0.020876 -0.148540 0.0600" zaxis="-0.120527 -0.857597 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_34_0" pos="-0.007850 -0.149794 0.0600" zaxis="-0.052137 -0.994829 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_34_1" pos="-0.007850 -0.149794 0.0600" zaxis="-0.051827 -0.988911 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_34_2" pos="-0.007850 -0.149794 0.0600" zaxis="-0.051192 -0.976807 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_34_3" pos="-0.007850 -0.149794 0.0600" zaxis="-0.050049 -0.954994 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_34_4" pos="-0.007850 -0.149794 0.0600" zaxis="-0.048176 -0.919243 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_34_5" pos="-0.007850 -0.149794 0.0600" zaxis="-0.045324 -0.864839 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_35_0" pos="0.005235 -0.149909 0.0600" zaxis="0.034767 -0.995588 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_35_1" pos="0.005235 -0.149909 0.0600" zaxis="0.034560 -0.989665 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_35_2" pos="0.005235 -0.149909 0.0600" zaxis="0.034137 -0.977552 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_35_3" pos="0.005235 -0.149909 0.0600" zaxis="0.033375 -0.955722 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_35_4" pos="0.005235 -0.149909 0.0600" zaxis="0.032125 -0.919944 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_35_5" pos="0.005235 -0.149909 0.0600" zaxis="0.030224 -0.865498 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_36_0" pos="0.083879 -0.124356 0.0600" zaxis="0.557065 -0.825883 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_36_1" pos="0.083879 -0.124356 0.0600" zaxis="0.553751 -0.820969 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_36_2" pos="0.083879 -0.124356 0.0600" zaxis="0.546973 -0.810921 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_36_3" pos="0.083879 -0.124356 0.0600" zaxis="0.534759 -0.792813 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_36_4" pos="0.083879 -0.124356 0.0600" zaxis="0.514740 -0.763133 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_36_5" pos="0.083879 -0.124356 0.0600" zaxis="0.484275 -0.717968 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_37_0" pos="0.094398 -0.116572 0.0600" zaxis="0.626926 -0.774189 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_37_1" pos="0.094398 -0.116572 0.0600" zaxis="0.623196 -0.769583 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_37_2" pos="0.094398 -0.116572 0.0600" zaxis="0.615568 -0.760163 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_37_3" pos="0.094398 -0.116572 0.0600" zaxis="0.601822 -0.743188 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_37_4" pos="0.094398 -0.116572 0.0600" zaxis="0.579292 -0.715367 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_37_5" pos="0.094398 -0.116572 0.0600" zaxis="0.545007 -0.673028 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_38_0" pos="0.104199 -0.107901 0.0600" zaxis="0.692015 -0.716602 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_38_1" pos="0.104199 -0.107901 0.0600" zaxis="0.687898 -0.712339 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_38_2" pos="0.104199 -0.107901 0.0600" zaxis="0.679478 -0.703620 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_38_3" pos="0.104199 -0.107901 0.0600" zaxis="0.664305 -0.687908 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_38_4" pos="0.104199 -0.107901 0.0600" zaxis="0.639436 -0.662156 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_38_5" pos="0.104199 -0.107901 0.0600" zaxis="0.601592 -0.622967 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_39_0" pos="0.113206 -0.098409 0.0600" zaxis="0.751838 -0.653563 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_39_1" pos="0.113206 -0.098409 0.0600" zaxis="0.747365 -0.649674 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_39_2" pos="0.113206 -0.098409 0.0600" zaxis="0.738217 -0.641723 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_39_3" pos="0.113206 -0.098409 0.0600" zaxis="0.721732 -0.627392 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_39_4" pos="0.113206 -0.098409 0.0600" zaxis="0.694714 -0.603906 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_39_5" pos="0.113206 -0.098409 0.0600" zaxis="0.653598 -0.568164 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_40_0" pos="0.121353 -0.088168 0.0600" zaxis="0.805938 -0.585549 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_40_1" pos="0.121353 -0.088168 0.0600" zaxis="0.801144 -0.582065 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_40_2" pos="0.121353 -0.088168 0.0600" zaxis="0.791338 -0.574941 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_40_3" pos="0.121353 -0.088168 0.0600" zaxis="0.773667 -0.562102 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_40_4" pos="0.121353 -0.088168 0.0600" zaxis="0.744704 -0.541059 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_40_5" pos="0.121353 -0.088168 0.0600" zaxis="0.700629 -0.509037 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_41_0" pos="0.128575 -0.077256 0.0600" zaxis="0.853906 -0.513078 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_41_1" pos="0.128575 -0.077256 0.0600" zaxis="0.848825 -0.510026 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_41_2" pos="0.128575 -0.077256 0.0600" zaxis="0.838436 -0.503783 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_41_3" pos="0.128575 -0.077256 0.0600" zaxis="0.819713 -0.492533 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_41_4" pos="0.128575 -0.077256 0.0600" zaxis="0.789027 -0.474095 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_41_5" pos="0.128575 -0.077256 0.0600" zaxis="0.742329 -0.446036 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_42_0" pos="0.134819 -0.065756 0.0600" zaxis="0.895374 -0.436703 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_42_1" pos="0.134819 -0.065756 0.0600" zaxis="0.890047 -0.434105 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_42_2" pos="0.134819 -0.065756 0.0600" zaxis="0.879153 -0.428792 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_42_3" pos="0.134819 -0.065756 0.0600" zaxis="0.859521 -0.419216 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_42_4" pos="0.134819 -0.065756 0.0600" zaxis="0.827344 -0.403523 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_42_5" pos="0.134819 -0.065756 0.0600" zaxis="0.778378 -0.379641 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_43_0" pos="0.140037 -0.053755 0.0600" zaxis="0.930028 -0.357004 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_43_1" pos="0.140037 -0.053755 0.0600" zaxis="0.924495 -0.354880 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_43_2" pos="0.140037 -0.053755 0.0600" zaxis="0.913179 -0.350537 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_43_3" pos="0.140037 -0.053755 0.0600" zaxis="0.892787 -0.342709 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_43_4" pos="0.140037 -0.053755 0.0600" zaxis="0.859365 -0.329879 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_43_5" pos="0.140037 -0.053755 0.0600" zaxis="0.808504 -0.310356 -0.500000" size="0.002" group="4"/>
+      <site name="sonar_44_0" pos="0.144189 -0.041346 0.0600" zaxis="0.957604 -0.274588 -0.087156" size="0.002" group="4"/>
+      <site name="sonar_44_1" pos="0.144189 -0.041346 0.0600" zaxis="0.951907 -0.272955 -0.139173" size="0.002" group="4"/>
+      <site name="sonar_44_2" pos="0.144189 -0.041346 0.0600" zaxis="0.940256 -0.269614 -0.207912" size="0.002" group="4"/>
+      <site name="sonar_44_3" pos="0.144189 -0.041346 0.0600" zaxis="0.919259 -0.263593 -0.292372" size="0.002" group="4"/>
+      <site name="sonar_44_4" pos="0.144189 -0.041346 0.0600" zaxis="0.884846 -0.253726 -0.390731" size="0.002" group="4"/>
+      <site name="sonar_44_5" pos="0.144189 -0.041346 0.0600" zaxis="0.832477 -0.238709 -0.500000" size="0.002" group="4"/>
       <geom class="visual" mesh="base__Chassis" material="sandstone_dark"/>
       <geom class="visual" mesh="base__Carapace" material="sandstone"/>
       <geom class="visual" mesh="base__Shoulder_Boot" material="rubber"/>
@@ -124,17 +394,24 @@
               </body>
               <site name="grasp" pos="0.0675 0.0076 0" size="0.004" rgba="0 1 0 0.6" group="4"/>
               <camera name="wrist" pos="0.020 0.0076 0.050" xyaxes="0 -1 0 0.342 0 0.940" fovy="70"/>
+              <site name="feel_0" pos="0.0900 0.0076 0" zaxis="0.913545 0.000000 -0.406737" size="0.002" group="4"/>
+              <site name="feel_1" pos="0.0900 0.0076 0" zaxis="0.978148 0.000000 -0.207912" size="0.002" group="4"/>
+              <site name="feel_2" pos="0.0900 0.0076 0" zaxis="1.000000 0.000000 0.000000" size="0.002" group="4"/>
+              <site name="feel_3" pos="0.0900 0.0076 0" zaxis="0.978148 0.000000 0.207912" size="0.002" group="4"/>
+              <site name="feel_4" pos="0.0900 0.0076 0" zaxis="0.913545 0.000000 0.406737" size="0.002" group="4"/>
               <body name="jaw_r">
                 <joint name="jaw_r" type="slide" axis="0 +1 0" range="0 0.0300" actuatorfrcrange="-20 20" damping="4" armature="0.4940"/>
                 <inertial pos="0.062843729 0.014425210 0.002834610" mass="0.004266566" fullinertia="1.072584532e-06 2.004299519e-07 1.052172069e-06 -5.420483582e-10 4.869729009e-08 7.820309846e-08"/>
                 <geom class="visual" mesh="gripper_m0__Jaw_R" material="sandstone_dark"/>
                 <geom name="jaw_r_pad" class="collision" type="box" size="0.0065 0.0030 0.0080" pos="0.0675 0.0106 0.0000" condim="6" priority="2" friction="1.4 0.05 0.002" solimp="0.95 0.99 0.001"/>
+                <site name="touch_jaw_r" type="box" size="0.0095 0.0050 0.0110" pos="0.0675 0.0106 0.0000" rgba="1 0.5 0 0.25" group="4"/>
               </body>
               <body name="jaw_l">
                 <joint name="jaw_l" type="slide" axis="0 -1 0" range="0 0.0300" actuatorfrcrange="-20 20" damping="4" armature="0.4940"/>
                 <inertial pos="0.062843729 0.000792079 -0.002834610" mass="0.004266566" fullinertia="1.072584443e-06 2.004299452e-07 1.05217198e-06 5.420518925e-10 -4.869728848e-08 7.820309626e-08"/>
                 <geom class="visual" mesh="gripper_m0__Jaw_L" material="sandstone_dark"/>
                 <geom name="jaw_l_pad" class="collision" type="box" size="0.0065 0.0030 0.0080" pos="0.0675 0.0046 0.0000" condim="6" priority="2" friction="1.4 0.05 0.002" solimp="0.95 0.99 0.001"/>
+                <site name="touch_jaw_l" type="box" size="0.0095 0.0050 0.0110" pos="0.0675 0.0046 0.0000" rgba="1 0.5 0 0.25" group="4"/>
               </body>
             </body>
           </body>
@@ -301,6 +578,284 @@
   </actuator>
 
   <sensor>
+    <!-- Echolocation: the robot has no camera. -->
+    <rangefinder name="sonar_00_0" site="sonar_00_0" cutoff="2.0"/>
+    <rangefinder name="sonar_00_1" site="sonar_00_1" cutoff="2.0"/>
+    <rangefinder name="sonar_00_2" site="sonar_00_2" cutoff="2.0"/>
+    <rangefinder name="sonar_00_3" site="sonar_00_3" cutoff="2.0"/>
+    <rangefinder name="sonar_00_4" site="sonar_00_4" cutoff="2.0"/>
+    <rangefinder name="sonar_00_5" site="sonar_00_5" cutoff="2.0"/>
+    <rangefinder name="sonar_01_0" site="sonar_01_0" cutoff="2.0"/>
+    <rangefinder name="sonar_01_1" site="sonar_01_1" cutoff="2.0"/>
+    <rangefinder name="sonar_01_2" site="sonar_01_2" cutoff="2.0"/>
+    <rangefinder name="sonar_01_3" site="sonar_01_3" cutoff="2.0"/>
+    <rangefinder name="sonar_01_4" site="sonar_01_4" cutoff="2.0"/>
+    <rangefinder name="sonar_01_5" site="sonar_01_5" cutoff="2.0"/>
+    <rangefinder name="sonar_02_0" site="sonar_02_0" cutoff="2.0"/>
+    <rangefinder name="sonar_02_1" site="sonar_02_1" cutoff="2.0"/>
+    <rangefinder name="sonar_02_2" site="sonar_02_2" cutoff="2.0"/>
+    <rangefinder name="sonar_02_3" site="sonar_02_3" cutoff="2.0"/>
+    <rangefinder name="sonar_02_4" site="sonar_02_4" cutoff="2.0"/>
+    <rangefinder name="sonar_02_5" site="sonar_02_5" cutoff="2.0"/>
+    <rangefinder name="sonar_03_0" site="sonar_03_0" cutoff="2.0"/>
+    <rangefinder name="sonar_03_1" site="sonar_03_1" cutoff="2.0"/>
+    <rangefinder name="sonar_03_2" site="sonar_03_2" cutoff="2.0"/>
+    <rangefinder name="sonar_03_3" site="sonar_03_3" cutoff="2.0"/>
+    <rangefinder name="sonar_03_4" site="sonar_03_4" cutoff="2.0"/>
+    <rangefinder name="sonar_03_5" site="sonar_03_5" cutoff="2.0"/>
+    <rangefinder name="sonar_04_0" site="sonar_04_0" cutoff="2.0"/>
+    <rangefinder name="sonar_04_1" site="sonar_04_1" cutoff="2.0"/>
+    <rangefinder name="sonar_04_2" site="sonar_04_2" cutoff="2.0"/>
+    <rangefinder name="sonar_04_3" site="sonar_04_3" cutoff="2.0"/>
+    <rangefinder name="sonar_04_4" site="sonar_04_4" cutoff="2.0"/>
+    <rangefinder name="sonar_04_5" site="sonar_04_5" cutoff="2.0"/>
+    <rangefinder name="sonar_05_0" site="sonar_05_0" cutoff="2.0"/>
+    <rangefinder name="sonar_05_1" site="sonar_05_1" cutoff="2.0"/>
+    <rangefinder name="sonar_05_2" site="sonar_05_2" cutoff="2.0"/>
+    <rangefinder name="sonar_05_3" site="sonar_05_3" cutoff="2.0"/>
+    <rangefinder name="sonar_05_4" site="sonar_05_4" cutoff="2.0"/>
+    <rangefinder name="sonar_05_5" site="sonar_05_5" cutoff="2.0"/>
+    <rangefinder name="sonar_06_0" site="sonar_06_0" cutoff="2.0"/>
+    <rangefinder name="sonar_06_1" site="sonar_06_1" cutoff="2.0"/>
+    <rangefinder name="sonar_06_2" site="sonar_06_2" cutoff="2.0"/>
+    <rangefinder name="sonar_06_3" site="sonar_06_3" cutoff="2.0"/>
+    <rangefinder name="sonar_06_4" site="sonar_06_4" cutoff="2.0"/>
+    <rangefinder name="sonar_06_5" site="sonar_06_5" cutoff="2.0"/>
+    <rangefinder name="sonar_07_0" site="sonar_07_0" cutoff="2.0"/>
+    <rangefinder name="sonar_07_1" site="sonar_07_1" cutoff="2.0"/>
+    <rangefinder name="sonar_07_2" site="sonar_07_2" cutoff="2.0"/>
+    <rangefinder name="sonar_07_3" site="sonar_07_3" cutoff="2.0"/>
+    <rangefinder name="sonar_07_4" site="sonar_07_4" cutoff="2.0"/>
+    <rangefinder name="sonar_07_5" site="sonar_07_5" cutoff="2.0"/>
+    <rangefinder name="sonar_08_0" site="sonar_08_0" cutoff="2.0"/>
+    <rangefinder name="sonar_08_1" site="sonar_08_1" cutoff="2.0"/>
+    <rangefinder name="sonar_08_2" site="sonar_08_2" cutoff="2.0"/>
+    <rangefinder name="sonar_08_3" site="sonar_08_3" cutoff="2.0"/>
+    <rangefinder name="sonar_08_4" site="sonar_08_4" cutoff="2.0"/>
+    <rangefinder name="sonar_08_5" site="sonar_08_5" cutoff="2.0"/>
+    <rangefinder name="sonar_09_0" site="sonar_09_0" cutoff="2.0"/>
+    <rangefinder name="sonar_09_1" site="sonar_09_1" cutoff="2.0"/>
+    <rangefinder name="sonar_09_2" site="sonar_09_2" cutoff="2.0"/>
+    <rangefinder name="sonar_09_3" site="sonar_09_3" cutoff="2.0"/>
+    <rangefinder name="sonar_09_4" site="sonar_09_4" cutoff="2.0"/>
+    <rangefinder name="sonar_09_5" site="sonar_09_5" cutoff="2.0"/>
+    <rangefinder name="sonar_10_0" site="sonar_10_0" cutoff="2.0"/>
+    <rangefinder name="sonar_10_1" site="sonar_10_1" cutoff="2.0"/>
+    <rangefinder name="sonar_10_2" site="sonar_10_2" cutoff="2.0"/>
+    <rangefinder name="sonar_10_3" site="sonar_10_3" cutoff="2.0"/>
+    <rangefinder name="sonar_10_4" site="sonar_10_4" cutoff="2.0"/>
+    <rangefinder name="sonar_10_5" site="sonar_10_5" cutoff="2.0"/>
+    <rangefinder name="sonar_11_0" site="sonar_11_0" cutoff="2.0"/>
+    <rangefinder name="sonar_11_1" site="sonar_11_1" cutoff="2.0"/>
+    <rangefinder name="sonar_11_2" site="sonar_11_2" cutoff="2.0"/>
+    <rangefinder name="sonar_11_3" site="sonar_11_3" cutoff="2.0"/>
+    <rangefinder name="sonar_11_4" site="sonar_11_4" cutoff="2.0"/>
+    <rangefinder name="sonar_11_5" site="sonar_11_5" cutoff="2.0"/>
+    <rangefinder name="sonar_12_0" site="sonar_12_0" cutoff="2.0"/>
+    <rangefinder name="sonar_12_1" site="sonar_12_1" cutoff="2.0"/>
+    <rangefinder name="sonar_12_2" site="sonar_12_2" cutoff="2.0"/>
+    <rangefinder name="sonar_12_3" site="sonar_12_3" cutoff="2.0"/>
+    <rangefinder name="sonar_12_4" site="sonar_12_4" cutoff="2.0"/>
+    <rangefinder name="sonar_12_5" site="sonar_12_5" cutoff="2.0"/>
+    <rangefinder name="sonar_13_0" site="sonar_13_0" cutoff="2.0"/>
+    <rangefinder name="sonar_13_1" site="sonar_13_1" cutoff="2.0"/>
+    <rangefinder name="sonar_13_2" site="sonar_13_2" cutoff="2.0"/>
+    <rangefinder name="sonar_13_3" site="sonar_13_3" cutoff="2.0"/>
+    <rangefinder name="sonar_13_4" site="sonar_13_4" cutoff="2.0"/>
+    <rangefinder name="sonar_13_5" site="sonar_13_5" cutoff="2.0"/>
+    <rangefinder name="sonar_14_0" site="sonar_14_0" cutoff="2.0"/>
+    <rangefinder name="sonar_14_1" site="sonar_14_1" cutoff="2.0"/>
+    <rangefinder name="sonar_14_2" site="sonar_14_2" cutoff="2.0"/>
+    <rangefinder name="sonar_14_3" site="sonar_14_3" cutoff="2.0"/>
+    <rangefinder name="sonar_14_4" site="sonar_14_4" cutoff="2.0"/>
+    <rangefinder name="sonar_14_5" site="sonar_14_5" cutoff="2.0"/>
+    <rangefinder name="sonar_15_0" site="sonar_15_0" cutoff="2.0"/>
+    <rangefinder name="sonar_15_1" site="sonar_15_1" cutoff="2.0"/>
+    <rangefinder name="sonar_15_2" site="sonar_15_2" cutoff="2.0"/>
+    <rangefinder name="sonar_15_3" site="sonar_15_3" cutoff="2.0"/>
+    <rangefinder name="sonar_15_4" site="sonar_15_4" cutoff="2.0"/>
+    <rangefinder name="sonar_15_5" site="sonar_15_5" cutoff="2.0"/>
+    <rangefinder name="sonar_16_0" site="sonar_16_0" cutoff="2.0"/>
+    <rangefinder name="sonar_16_1" site="sonar_16_1" cutoff="2.0"/>
+    <rangefinder name="sonar_16_2" site="sonar_16_2" cutoff="2.0"/>
+    <rangefinder name="sonar_16_3" site="sonar_16_3" cutoff="2.0"/>
+    <rangefinder name="sonar_16_4" site="sonar_16_4" cutoff="2.0"/>
+    <rangefinder name="sonar_16_5" site="sonar_16_5" cutoff="2.0"/>
+    <rangefinder name="sonar_17_0" site="sonar_17_0" cutoff="2.0"/>
+    <rangefinder name="sonar_17_1" site="sonar_17_1" cutoff="2.0"/>
+    <rangefinder name="sonar_17_2" site="sonar_17_2" cutoff="2.0"/>
+    <rangefinder name="sonar_17_3" site="sonar_17_3" cutoff="2.0"/>
+    <rangefinder name="sonar_17_4" site="sonar_17_4" cutoff="2.0"/>
+    <rangefinder name="sonar_17_5" site="sonar_17_5" cutoff="2.0"/>
+    <rangefinder name="sonar_18_0" site="sonar_18_0" cutoff="2.0"/>
+    <rangefinder name="sonar_18_1" site="sonar_18_1" cutoff="2.0"/>
+    <rangefinder name="sonar_18_2" site="sonar_18_2" cutoff="2.0"/>
+    <rangefinder name="sonar_18_3" site="sonar_18_3" cutoff="2.0"/>
+    <rangefinder name="sonar_18_4" site="sonar_18_4" cutoff="2.0"/>
+    <rangefinder name="sonar_18_5" site="sonar_18_5" cutoff="2.0"/>
+    <rangefinder name="sonar_19_0" site="sonar_19_0" cutoff="2.0"/>
+    <rangefinder name="sonar_19_1" site="sonar_19_1" cutoff="2.0"/>
+    <rangefinder name="sonar_19_2" site="sonar_19_2" cutoff="2.0"/>
+    <rangefinder name="sonar_19_3" site="sonar_19_3" cutoff="2.0"/>
+    <rangefinder name="sonar_19_4" site="sonar_19_4" cutoff="2.0"/>
+    <rangefinder name="sonar_19_5" site="sonar_19_5" cutoff="2.0"/>
+    <rangefinder name="sonar_20_0" site="sonar_20_0" cutoff="2.0"/>
+    <rangefinder name="sonar_20_1" site="sonar_20_1" cutoff="2.0"/>
+    <rangefinder name="sonar_20_2" site="sonar_20_2" cutoff="2.0"/>
+    <rangefinder name="sonar_20_3" site="sonar_20_3" cutoff="2.0"/>
+    <rangefinder name="sonar_20_4" site="sonar_20_4" cutoff="2.0"/>
+    <rangefinder name="sonar_20_5" site="sonar_20_5" cutoff="2.0"/>
+    <rangefinder name="sonar_21_0" site="sonar_21_0" cutoff="2.0"/>
+    <rangefinder name="sonar_21_1" site="sonar_21_1" cutoff="2.0"/>
+    <rangefinder name="sonar_21_2" site="sonar_21_2" cutoff="2.0"/>
+    <rangefinder name="sonar_21_3" site="sonar_21_3" cutoff="2.0"/>
+    <rangefinder name="sonar_21_4" site="sonar_21_4" cutoff="2.0"/>
+    <rangefinder name="sonar_21_5" site="sonar_21_5" cutoff="2.0"/>
+    <rangefinder name="sonar_22_0" site="sonar_22_0" cutoff="2.0"/>
+    <rangefinder name="sonar_22_1" site="sonar_22_1" cutoff="2.0"/>
+    <rangefinder name="sonar_22_2" site="sonar_22_2" cutoff="2.0"/>
+    <rangefinder name="sonar_22_3" site="sonar_22_3" cutoff="2.0"/>
+    <rangefinder name="sonar_22_4" site="sonar_22_4" cutoff="2.0"/>
+    <rangefinder name="sonar_22_5" site="sonar_22_5" cutoff="2.0"/>
+    <rangefinder name="sonar_23_0" site="sonar_23_0" cutoff="2.0"/>
+    <rangefinder name="sonar_23_1" site="sonar_23_1" cutoff="2.0"/>
+    <rangefinder name="sonar_23_2" site="sonar_23_2" cutoff="2.0"/>
+    <rangefinder name="sonar_23_3" site="sonar_23_3" cutoff="2.0"/>
+    <rangefinder name="sonar_23_4" site="sonar_23_4" cutoff="2.0"/>
+    <rangefinder name="sonar_23_5" site="sonar_23_5" cutoff="2.0"/>
+    <rangefinder name="sonar_24_0" site="sonar_24_0" cutoff="2.0"/>
+    <rangefinder name="sonar_24_1" site="sonar_24_1" cutoff="2.0"/>
+    <rangefinder name="sonar_24_2" site="sonar_24_2" cutoff="2.0"/>
+    <rangefinder name="sonar_24_3" site="sonar_24_3" cutoff="2.0"/>
+    <rangefinder name="sonar_24_4" site="sonar_24_4" cutoff="2.0"/>
+    <rangefinder name="sonar_24_5" site="sonar_24_5" cutoff="2.0"/>
+    <rangefinder name="sonar_25_0" site="sonar_25_0" cutoff="2.0"/>
+    <rangefinder name="sonar_25_1" site="sonar_25_1" cutoff="2.0"/>
+    <rangefinder name="sonar_25_2" site="sonar_25_2" cutoff="2.0"/>
+    <rangefinder name="sonar_25_3" site="sonar_25_3" cutoff="2.0"/>
+    <rangefinder name="sonar_25_4" site="sonar_25_4" cutoff="2.0"/>
+    <rangefinder name="sonar_25_5" site="sonar_25_5" cutoff="2.0"/>
+    <rangefinder name="sonar_26_0" site="sonar_26_0" cutoff="2.0"/>
+    <rangefinder name="sonar_26_1" site="sonar_26_1" cutoff="2.0"/>
+    <rangefinder name="sonar_26_2" site="sonar_26_2" cutoff="2.0"/>
+    <rangefinder name="sonar_26_3" site="sonar_26_3" cutoff="2.0"/>
+    <rangefinder name="sonar_26_4" site="sonar_26_4" cutoff="2.0"/>
+    <rangefinder name="sonar_26_5" site="sonar_26_5" cutoff="2.0"/>
+    <rangefinder name="sonar_27_0" site="sonar_27_0" cutoff="2.0"/>
+    <rangefinder name="sonar_27_1" site="sonar_27_1" cutoff="2.0"/>
+    <rangefinder name="sonar_27_2" site="sonar_27_2" cutoff="2.0"/>
+    <rangefinder name="sonar_27_3" site="sonar_27_3" cutoff="2.0"/>
+    <rangefinder name="sonar_27_4" site="sonar_27_4" cutoff="2.0"/>
+    <rangefinder name="sonar_27_5" site="sonar_27_5" cutoff="2.0"/>
+    <rangefinder name="sonar_28_0" site="sonar_28_0" cutoff="2.0"/>
+    <rangefinder name="sonar_28_1" site="sonar_28_1" cutoff="2.0"/>
+    <rangefinder name="sonar_28_2" site="sonar_28_2" cutoff="2.0"/>
+    <rangefinder name="sonar_28_3" site="sonar_28_3" cutoff="2.0"/>
+    <rangefinder name="sonar_28_4" site="sonar_28_4" cutoff="2.0"/>
+    <rangefinder name="sonar_28_5" site="sonar_28_5" cutoff="2.0"/>
+    <rangefinder name="sonar_29_0" site="sonar_29_0" cutoff="2.0"/>
+    <rangefinder name="sonar_29_1" site="sonar_29_1" cutoff="2.0"/>
+    <rangefinder name="sonar_29_2" site="sonar_29_2" cutoff="2.0"/>
+    <rangefinder name="sonar_29_3" site="sonar_29_3" cutoff="2.0"/>
+    <rangefinder name="sonar_29_4" site="sonar_29_4" cutoff="2.0"/>
+    <rangefinder name="sonar_29_5" site="sonar_29_5" cutoff="2.0"/>
+    <rangefinder name="sonar_30_0" site="sonar_30_0" cutoff="2.0"/>
+    <rangefinder name="sonar_30_1" site="sonar_30_1" cutoff="2.0"/>
+    <rangefinder name="sonar_30_2" site="sonar_30_2" cutoff="2.0"/>
+    <rangefinder name="sonar_30_3" site="sonar_30_3" cutoff="2.0"/>
+    <rangefinder name="sonar_30_4" site="sonar_30_4" cutoff="2.0"/>
+    <rangefinder name="sonar_30_5" site="sonar_30_5" cutoff="2.0"/>
+    <rangefinder name="sonar_31_0" site="sonar_31_0" cutoff="2.0"/>
+    <rangefinder name="sonar_31_1" site="sonar_31_1" cutoff="2.0"/>
+    <rangefinder name="sonar_31_2" site="sonar_31_2" cutoff="2.0"/>
+    <rangefinder name="sonar_31_3" site="sonar_31_3" cutoff="2.0"/>
+    <rangefinder name="sonar_31_4" site="sonar_31_4" cutoff="2.0"/>
+    <rangefinder name="sonar_31_5" site="sonar_31_5" cutoff="2.0"/>
+    <rangefinder name="sonar_32_0" site="sonar_32_0" cutoff="2.0"/>
+    <rangefinder name="sonar_32_1" site="sonar_32_1" cutoff="2.0"/>
+    <rangefinder name="sonar_32_2" site="sonar_32_2" cutoff="2.0"/>
+    <rangefinder name="sonar_32_3" site="sonar_32_3" cutoff="2.0"/>
+    <rangefinder name="sonar_32_4" site="sonar_32_4" cutoff="2.0"/>
+    <rangefinder name="sonar_32_5" site="sonar_32_5" cutoff="2.0"/>
+    <rangefinder name="sonar_33_0" site="sonar_33_0" cutoff="2.0"/>
+    <rangefinder name="sonar_33_1" site="sonar_33_1" cutoff="2.0"/>
+    <rangefinder name="sonar_33_2" site="sonar_33_2" cutoff="2.0"/>
+    <rangefinder name="sonar_33_3" site="sonar_33_3" cutoff="2.0"/>
+    <rangefinder name="sonar_33_4" site="sonar_33_4" cutoff="2.0"/>
+    <rangefinder name="sonar_33_5" site="sonar_33_5" cutoff="2.0"/>
+    <rangefinder name="sonar_34_0" site="sonar_34_0" cutoff="2.0"/>
+    <rangefinder name="sonar_34_1" site="sonar_34_1" cutoff="2.0"/>
+    <rangefinder name="sonar_34_2" site="sonar_34_2" cutoff="2.0"/>
+    <rangefinder name="sonar_34_3" site="sonar_34_3" cutoff="2.0"/>
+    <rangefinder name="sonar_34_4" site="sonar_34_4" cutoff="2.0"/>
+    <rangefinder name="sonar_34_5" site="sonar_34_5" cutoff="2.0"/>
+    <rangefinder name="sonar_35_0" site="sonar_35_0" cutoff="2.0"/>
+    <rangefinder name="sonar_35_1" site="sonar_35_1" cutoff="2.0"/>
+    <rangefinder name="sonar_35_2" site="sonar_35_2" cutoff="2.0"/>
+    <rangefinder name="sonar_35_3" site="sonar_35_3" cutoff="2.0"/>
+    <rangefinder name="sonar_35_4" site="sonar_35_4" cutoff="2.0"/>
+    <rangefinder name="sonar_35_5" site="sonar_35_5" cutoff="2.0"/>
+    <rangefinder name="sonar_36_0" site="sonar_36_0" cutoff="2.0"/>
+    <rangefinder name="sonar_36_1" site="sonar_36_1" cutoff="2.0"/>
+    <rangefinder name="sonar_36_2" site="sonar_36_2" cutoff="2.0"/>
+    <rangefinder name="sonar_36_3" site="sonar_36_3" cutoff="2.0"/>
+    <rangefinder name="sonar_36_4" site="sonar_36_4" cutoff="2.0"/>
+    <rangefinder name="sonar_36_5" site="sonar_36_5" cutoff="2.0"/>
+    <rangefinder name="sonar_37_0" site="sonar_37_0" cutoff="2.0"/>
+    <rangefinder name="sonar_37_1" site="sonar_37_1" cutoff="2.0"/>
+    <rangefinder name="sonar_37_2" site="sonar_37_2" cutoff="2.0"/>
+    <rangefinder name="sonar_37_3" site="sonar_37_3" cutoff="2.0"/>
+    <rangefinder name="sonar_37_4" site="sonar_37_4" cutoff="2.0"/>
+    <rangefinder name="sonar_37_5" site="sonar_37_5" cutoff="2.0"/>
+    <rangefinder name="sonar_38_0" site="sonar_38_0" cutoff="2.0"/>
+    <rangefinder name="sonar_38_1" site="sonar_38_1" cutoff="2.0"/>
+    <rangefinder name="sonar_38_2" site="sonar_38_2" cutoff="2.0"/>
+    <rangefinder name="sonar_38_3" site="sonar_38_3" cutoff="2.0"/>
+    <rangefinder name="sonar_38_4" site="sonar_38_4" cutoff="2.0"/>
+    <rangefinder name="sonar_38_5" site="sonar_38_5" cutoff="2.0"/>
+    <rangefinder name="sonar_39_0" site="sonar_39_0" cutoff="2.0"/>
+    <rangefinder name="sonar_39_1" site="sonar_39_1" cutoff="2.0"/>
+    <rangefinder name="sonar_39_2" site="sonar_39_2" cutoff="2.0"/>
+    <rangefinder name="sonar_39_3" site="sonar_39_3" cutoff="2.0"/>
+    <rangefinder name="sonar_39_4" site="sonar_39_4" cutoff="2.0"/>
+    <rangefinder name="sonar_39_5" site="sonar_39_5" cutoff="2.0"/>
+    <rangefinder name="sonar_40_0" site="sonar_40_0" cutoff="2.0"/>
+    <rangefinder name="sonar_40_1" site="sonar_40_1" cutoff="2.0"/>
+    <rangefinder name="sonar_40_2" site="sonar_40_2" cutoff="2.0"/>
+    <rangefinder name="sonar_40_3" site="sonar_40_3" cutoff="2.0"/>
+    <rangefinder name="sonar_40_4" site="sonar_40_4" cutoff="2.0"/>
+    <rangefinder name="sonar_40_5" site="sonar_40_5" cutoff="2.0"/>
+    <rangefinder name="sonar_41_0" site="sonar_41_0" cutoff="2.0"/>
+    <rangefinder name="sonar_41_1" site="sonar_41_1" cutoff="2.0"/>
+    <rangefinder name="sonar_41_2" site="sonar_41_2" cutoff="2.0"/>
+    <rangefinder name="sonar_41_3" site="sonar_41_3" cutoff="2.0"/>
+    <rangefinder name="sonar_41_4" site="sonar_41_4" cutoff="2.0"/>
+    <rangefinder name="sonar_41_5" site="sonar_41_5" cutoff="2.0"/>
+    <rangefinder name="sonar_42_0" site="sonar_42_0" cutoff="2.0"/>
+    <rangefinder name="sonar_42_1" site="sonar_42_1" cutoff="2.0"/>
+    <rangefinder name="sonar_42_2" site="sonar_42_2" cutoff="2.0"/>
+    <rangefinder name="sonar_42_3" site="sonar_42_3" cutoff="2.0"/>
+    <rangefinder name="sonar_42_4" site="sonar_42_4" cutoff="2.0"/>
+    <rangefinder name="sonar_42_5" site="sonar_42_5" cutoff="2.0"/>
+    <rangefinder name="sonar_43_0" site="sonar_43_0" cutoff="2.0"/>
+    <rangefinder name="sonar_43_1" site="sonar_43_1" cutoff="2.0"/>
+    <rangefinder name="sonar_43_2" site="sonar_43_2" cutoff="2.0"/>
+    <rangefinder name="sonar_43_3" site="sonar_43_3" cutoff="2.0"/>
+    <rangefinder name="sonar_43_4" site="sonar_43_4" cutoff="2.0"/>
+    <rangefinder name="sonar_43_5" site="sonar_43_5" cutoff="2.0"/>
+    <rangefinder name="sonar_44_0" site="sonar_44_0" cutoff="2.0"/>
+    <rangefinder name="sonar_44_1" site="sonar_44_1" cutoff="2.0"/>
+    <rangefinder name="sonar_44_2" site="sonar_44_2" cutoff="2.0"/>
+    <rangefinder name="sonar_44_3" site="sonar_44_3" cutoff="2.0"/>
+    <rangefinder name="sonar_44_4" site="sonar_44_4" cutoff="2.0"/>
+    <rangefinder name="sonar_44_5" site="sonar_44_5" cutoff="2.0"/>
+    <rangefinder name="feel_0" site="feel_0" cutoff="2.0"/>
+    <rangefinder name="feel_1" site="feel_1" cutoff="2.0"/>
+    <rangefinder name="feel_2" site="feel_2" cutoff="2.0"/>
+    <rangefinder name="feel_3" site="feel_3" cutoff="2.0"/>
+    <rangefinder name="feel_4" site="feel_4" cutoff="2.0"/>
+    <touch name="touch_jaw_r" site="touch_jaw_r"/>
+    <touch name="touch_jaw_l" site="touch_jaw_l"/>
     <gyro name="imu_ang_vel" site="imu"/>
     <velocimeter name="imu_lin_vel" site="imu"/>
     <accelerometer name="imu_lin_acc" site="imu"/>

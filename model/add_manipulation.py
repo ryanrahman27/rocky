@@ -18,6 +18,7 @@ stop a cube ever entering the fingers.
 
 from __future__ import annotations
 
+import math
 import re
 from pathlib import Path
 
@@ -44,6 +45,40 @@ JAW_ZETA = 2.0                 # same overdamped target as the legs
 JAW_KP = JAW_ARMATURE * JAW_BANDWIDTH ** 2
 JAW_KV = 2.0 * JAW_ZETA * JAW_ARMATURE * JAW_BANDWIDTH
 JAW_FORCE = 20.0               # N, the screw's working thrust
+
+# --- echolocation ---------------------------------------------------------
+# Eridians have no eyes. Rocky perceives shape by sound, which is why he could
+# never see the stars and why everything he and Grace exchanged had to be handed
+# over physically. Modelling that honestly means the robot gets no camera at
+# all: rangefinders standing in for the sonar, and touch.
+#
+# Where the emitters go is decided entirely by the body plan, and it took three
+# tries to find out. From over the body axis, the elevation needed to see
+# something at arm's length is steep enough that the ray hits the robot's own
+# shoulder on the way out: a 20 deg cone straight ahead came back at 0.11 m, the
+# coxa, in every gait phase including the one where the front limb is airborne,
+# because the coxa never leaves that azimuth. Moving the emitters out to the
+# carapace rim cleared the coxa and buried them inside the femur instead.
+#
+# What is actually true is that a limb blocks about 12 deg either side of its
+# own azimuth and no mounting changes that -- the same problem a real legged
+# robot has with a body lidar. So the emitters live in the five GAPS between the
+# limbs, 40 deg of coverage each, and the robot has to hold whatever it is
+# listening to inside a gap. That is why `rocky.approach` walks in crabwise with
+# the cubes held about 36 deg off the body axis: it is the only way this body
+# plan can watch where it is going. Squared up for the grasp the cubes are dead
+# ahead, in leg 0's shadow, and the wrist fan takes over.
+SONAR_RADIUS = 0.150           # out past the shoulder ring, m
+SONAR_HEIGHT = 0.060           # above the base origin, m
+SONAR_GAP_HALF = 20.0          # coverage either side of a gap centre, deg
+SONAR_GAP_STEP = 5.0           # finer than the 6.5 deg a cube subtends at reach
+SONAR_BANDS = (5.0, 8.0, 12.0, 17.0, 23.0, 30.0)   # depression below horizontal, deg
+SONAR_CUTOFF = 2.0             # m; past this the return is clipped
+
+WRIST_SONAR = (-24.0, -12.0, 0.0, 12.0, 24.0)   # about the gripper's own +X, deg
+WRIST_SONAR_X = 0.090          # past the pads (74 mm) and the foot sphere (84 mm):
+                               # fired from inside the hand every ray lands on
+                               # the robot's own foot at 38 mm and sees nothing else
 FINGER_X = (0.061, 0.074)      # finger extent along the gripper +X
 FINGER_Z = (-0.008, 0.008)
 FINGER_T = 0.006               # finger thickness in Y
@@ -80,6 +115,67 @@ def inertial_xml(indent, M, C, I):
             'fullinertia="%.10g %.10g %.10g %.10g %.10g %.10g"/>'
             % (indent, C[0], C[1], C[2], M, I[0, 0], I[1, 1], I[2, 2], I[0, 1], I[0, 2], I[1, 2]))
 
+
+
+def sonar_azimuths():
+    """Emitter bearings: a fan in each of the five gaps between the limbs."""
+    out = []
+    n = int(SONAR_GAP_HALF / SONAR_GAP_STEP)
+    for k in range(5):
+        centre = 72.0 * k + 36.0            # halfway between limb k and limb k+1
+        for i in range(-n, n + 1):
+            out.append(centre + i * SONAR_GAP_STEP)
+    return out
+
+
+def sonar_names():
+    """(name, azimuth deg, depression deg) for every ray in the body ring."""
+    out = []
+    for i, az in enumerate(sonar_azimuths()):
+        for j, dep in enumerate(SONAR_BANDS):
+            out.append((f"sonar_{i:02d}_{j}", az, dep))
+    return out
+
+
+def sonar_sites(indent="      "):
+    """Emitter sites. A rangefinder casts along its site's +Z, so each ray is
+    just a site whose z axis points where we want to listen."""
+    lines = []
+    for name, az, dep in sonar_names():
+        a, d = math.radians(az), math.radians(dep)
+        z = (math.cos(d) * math.cos(a), math.cos(d) * math.sin(a), -math.sin(d))
+        pos = (SONAR_RADIUS * math.cos(a), SONAR_RADIUS * math.sin(a), SONAR_HEIGHT)
+        lines.append(f'{indent}<site name="{name}" '
+                     f'pos="{pos[0]:.6f} {pos[1]:.6f} {pos[2]:.4f}" '
+                     f'zaxis="{z[0]:.6f} {z[1]:.6f} {z[2]:.6f}" size="0.002" group="4"/>')
+    return "\n".join(lines)
+
+
+def wrist_sonar_names():
+    return [(f"feel_{i}", a) for i, a in enumerate(WRIST_SONAR)]
+
+
+def wrist_sonar_sites(indent, pos_x=WRIST_SONAR_X):
+    """The gripper's own fan, swept about the jaw axis so it looks out past the
+    fingers along whatever approach the wrist is holding."""
+    lines = []
+    for name, ang in wrist_sonar_names():
+        a = math.radians(ang)
+        z = (math.cos(a), 0.0, math.sin(a))
+        lines.append(f'{indent}<site name="{name}" pos="{pos_x:.4f} {CENTRELINE_Y:.4f} 0" '
+                     f'zaxis="{z[0]:.6f} {z[1]:.6f} {z[2]:.6f}" size="0.002" group="4"/>')
+    return "\n".join(lines)
+
+
+def sonar_sensors(indent="    "):
+    lines = ["    <!-- Echolocation: the robot has no camera. -->"]
+    for name, _, _ in sonar_names():
+        lines.append(f'{indent}<rangefinder name="{name}" site="{name}" cutoff="{SONAR_CUTOFF}"/>')
+    for name, _ in wrist_sonar_names():
+        lines.append(f'{indent}<rangefinder name="{name}" site="{name}" cutoff="{SONAR_CUTOFF}"/>')
+    for jaw in ("jaw_r", "jaw_l"):
+        lines.append(f'{indent}<touch name="touch_{jaw}" site="touch_{jaw}"/>')
+    return "\n".join(lines)
 
 def main() -> int:
     s = SRC.read_text()
@@ -126,6 +222,13 @@ def main() -> int:
             f'size="{(FINGER_X[1]-FINGER_X[0])/2:.4f} {FINGER_T/2:.4f} {(FINGER_Z[1]-FINGER_Z[0])/2:.4f}" '
             f'pos="{(FINGER_X[0]+FINGER_X[1])/2:.4f} {y:.4f} {(FINGER_Z[0]+FINGER_Z[1])/2:.4f}" '
             f'condim="6" priority="2" friction="1.4 0.05 0.002" solimp="0.95 0.99 0.001"/>',
+            # A touch sensor sums the normal force of every contact inside its
+            # site's volume, so the box just has to contain the pad.
+            f'{i2}  <site name="touch_{jointname}" type="box" '
+            f'size="{(FINGER_X[1]-FINGER_X[0])/2+0.003:.4f} {FINGER_T/2+0.002:.4f} '
+            f'{(FINGER_Z[1]-FINGER_Z[0])/2+0.003:.4f}" '
+            f'pos="{(FINGER_X[0]+FINGER_X[1])/2:.4f} {y:.4f} {(FINGER_Z[0]+FINGER_Z[1])/2:.4f}" '
+            f'rgba="1 0.5 0 0.25" group="4"/>',
             f'{i2}</body>',
         ])
 
@@ -158,11 +261,18 @@ def main() -> int:
         # 40 deg down the approach axis so the fingers sit mid-frame
         f'{i2}<camera name="wrist" pos="0.020 {CENTRELINE_Y:.4f} 0.050" '
         f'xyaxes="0 -1 0 0.342 0 0.940" fovy="70"/>',
+        wrist_sonar_sites(i2),
         jaw_block("Jaw_R", +1, "jaw_r"),
         jaw_block("Jaw_L", -1, "jaw_l"),
         f'{ind}</body>',
     ]) + "\n"
     s = s[:old.start()] + new + s[old.end():]
+
+    # --- sonar ring and touch pads ----------------------------------------
+    s = s.replace('      <site name="imu" pos="0 0 0.0125" size="0.005" group="4"/>',
+                  '      <site name="imu" pos="0 0 0.0125" size="0.005" group="4"/>\n'
+                  + sonar_sites())
+    s = s.replace('  <sensor>', '  <sensor>\n' + sonar_sensors())
 
     # --- head camera on the carapace --------------------------------------
     s = s.replace('      <site name="imu" pos="0 0 0.0125" size="0.005" group="4"/>',

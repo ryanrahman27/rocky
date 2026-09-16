@@ -203,6 +203,63 @@ VLA needs to take over that half.
 approach-angle search the ±75° wrist forces, the four pieces of geometry that
 break the obvious version of this script, and the measured working envelope.
 
+## Blind
+
+Rocky has no eyes. Eridians perceive shape by sound — it is why he could never
+see the stars, and why everything he and Grace exchanged had to be handed over
+physically rather than pointed at. So there is a second version of the task with
+the cameras removed entirely, and with them the case for a vision-language
+policy: there is no image to condition on.
+
+```bash
+uv run python scripts/blind_stack_demo.py --episodes 14
+uv run python scripts/blind_stack_demo.py --video docs/rocky_blind.mp4
+uv run python scripts/blind_stack_demo.py --episodes 80 --noise 0.004 \
+    --dataset data/blind_stack.npz
+uv run python scripts/train_diffusion.py data/blind_stack.npz --epochs 200
+```
+
+What the robot has instead: 270 rangefinders standing in for the sonar, five more
+fanning out from the gripper, two touch pads, the joint encoders and an IMU. **11
+of 14 episodes stacked** on that alone — nothing in the pipeline reads a cube's
+true pose.
+
+The emitters live in the five **gaps between the limbs**, because a limb blocks
+about 12° either side of its own azimuth and no mounting changes that. Which
+means facing the cubes squarely puts them where nothing can be heard — so the
+robot **walks in sideways**, holding them 36° off its body axis, and only squares
+up at 0.55 m when the arm is about to take over. That is not a trick to make the
+demo work; it is what this body plan has to do to watch where it is going.
+
+Then the arm becomes the sensor. The brace lifts leg 0, the gripper sweeps 60°
+across the front listening through its own open hand, and locates both cubes to
+**4–6 mm** — an order of magnitude better than the body ring. The grasp is
+confirmed by the touch pads, which is a blind robot's only way of knowing it
+actually picked anything up, and on a miss it feels around and tries again.
+
+[docs/blind.md](docs/blind.md) has the sensor design, the three estimator bugs
+that each cost an episode to find, and the measured accuracy.
+
+### A diffusion policy, not a VLA
+
+`scripts/train_diffusion.py` is Diffusion Policy (Chi et al. 2023) at its
+smallest useful size: a DDPM over 8-step action chunks conditioned on the last
+two observations. The observation is 319 floats — sonar residuals, the fan, the
+pads, joints, IMU — so the whole thing is an MLP rather than a ResNet and it
+trains on a laptop CPU in minutes.
+
+Trained on 11 demonstrations it reproduces the script to a **median 12 mrad**
+per joint over a sampled chunk (p90 57 mrad). That is enough to say the pipeline
+works end to end; it is not enough demonstrations to close the loop on, and the
+closed-loop rollout is the next thing to do.
+
+Chunking matters because the demonstrator's action depends on where it is in a
+fifteen-second sequence, and "descending onto the cube" looks much like "lowering
+it onto the other one" from a single frame. Diffusion matters because the
+interesting moments are multimodal: when the pads say the grasp missed, the
+demonstrator sometimes nudges and closes again and sometimes lifts off and
+re-sweeps, and averaging those two gives a motion that does neither.
+
 ## Tests
 
 ```bash
@@ -223,10 +280,11 @@ Next:
 
 - **Rough terrain.** `Mjlab-Velocity-Rough-Rocky` is registered and configured;
   the blind variant lets the current checkpoint be tried on terrain first.
-- **A VLA for the manipulation half.** The scripted sequence is a demonstrator,
-  not the destination: `scripts/stack_demo.py --dataset` already writes what a
-  policy needs to learn it. Registering the cube scene as an mjlab task, so the
-  arm can also be trained or fine-tuned with RL, is the piece that is missing.
+- **Close the loop on the diffusion policy.** Eleven demonstrations prove the
+  pipeline; a few hundred are needed before rolling it out in the sim means
+  anything. Generating them is embarrassingly parallel.
+- **An mjlab task for the cube scene**, so the arm can also be trained or
+  fine-tuned with RL rather than only cloned.
 - **Widening the arm's envelope.** The scripted stack fails inside 320 mm and
   outside ±15° of bearing (docs/manipulation.md has the table). The approach
   controller avoids both, but a learned policy should not have to.

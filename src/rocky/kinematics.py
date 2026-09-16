@@ -133,3 +133,24 @@ def joint_vector(q_legs: np.ndarray, wrist: float = 0.0) -> np.ndarray:
         if k == P.MANIP_LEG:
             out.append(wrist)
     return np.array(out)
+
+
+def limb_points(q_legs: np.ndarray) -> np.ndarray:
+    """Knee and foot of every leg, in the body frame, from the joint encoders.
+
+    Used to tell the sonar which of its returns are the robot's own limbs. A
+    swinging leg travels straight through the gap the emitters fire down, and
+    without this every stride throws off a phantom object.
+    """
+    out = []
+    for k in range(P.N_LEGS):
+        q = np.asarray(q_legs[k], float)
+        foot = leg_to_body(k, forward_kinematics(k, q))
+        knee_leg = np.array([
+            (P.COXA_LEN + P.FEMUR_LEN * math.cos(-q[1])) * math.cos(q[0]),
+            (P.COXA_LEN + P.FEMUR_LEN * math.cos(-q[1])) * math.sin(q[0]),
+            P.FEMUR_LEN * math.sin(-q[1]),
+        ])
+        out.append(leg_to_body(k, knee_leg))
+        out.append(foot)
+    return np.stack(out)

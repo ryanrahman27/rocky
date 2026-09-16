@@ -126,7 +126,7 @@ def run(args, rng, renderer=None, cams=None):
     if args.start is not None:
         base_xy, yaw = np.array(args.start[:2]), args.start[2]
     else:
-        base_xy, yaw = spawn_pose(rng)
+        base_xy, yaw = spawn_pose(rng, (red + blue) / 2.0)
     sc.reset(gait.neutral_joint_targets(), base_xy, yaw, red, blue)
 
     frames, records = [], []
