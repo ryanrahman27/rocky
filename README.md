@@ -1,12 +1,25 @@
 # Rocky
 
-A five-legged walking robot, from CAD to a trained locomotion policy.
+A five-legged walking robot, from CAD to a trained locomotion policy — and then
+to stacking cubes with no eyes at all.
 
 Rocky is a pentapod: a 250 mm pentagonal body carrying five identical 342 mm
-limbs at 72° spacing, one of which doubles as a manipulator. This repo holds the
-simulation model exported from the Fusion 360 master, an analytic wave gait, a
-PPO locomotion task for [mjlab](https://github.com/mujocolab/mjlab), and a
-manipulation stack that walks up to two cubes and stacks one on the other.
+limbs at 72° spacing, one of which doubles as a manipulator. He is modelled on
+Rocky from *Project Hail Mary*, and that includes the part where Eridians have no
+eyes and perceive shape by sound. This repo holds the simulation model exported
+from the Fusion 360 master, an analytic wave gait, a PPO locomotion task for
+[mjlab](https://github.com/mujocolab/mjlab), and a manipulation stack that finds
+two cubes by echolocation and stacks one on the other.
+
+![Rocky finding two cubes by sonar and stacking them](docs/blind_stack.gif)
+
+*No cameras anywhere. The yellow lines are 270 rangefinders standing in for the
+sonar, firing through the five gaps between the limbs — a limb blocks about 12°
+either side of its own azimuth, so those gaps are the only way this body plan can
+see out. Braced on four legs, the arm sweeps across the front listening through
+its own open hand, finds both cubes to 4–6 mm, and picks. Played at about 2×;
+the full clip is [docs/rocky_end_to_end.mp4](docs/rocky_end_to_end.mp4), where the
+PPO policy walks in first and a diffusion policy does the stacking.*
 
 ![Rocky walking, trained policy](docs/gait_policy.gif)
 
@@ -14,17 +27,15 @@ manipulation stack that walks up to two cubes and stacks one on the other.
 0.15 rad/s (right). Full clips: [forward](docs/rocky_walk_forward.mp4),
 [turning](docs/rocky_turn_in_place.mp4).*
 
-*Everything learned except perception — PPO walking in, diffusion policy stacking:
-[docs/rocky_end_to_end.mp4](docs/rocky_end_to_end.mp4). The diffusion policy alone:
-[docs/rocky_policy.mp4](docs/rocky_policy.mp4).
-Walking up to two cubes and stacking the red one on the blue:
-[docs/rocky_stack.mp4](docs/rocky_stack.mp4). The locomotion controller parks the
-robot, then hands over to the arm.*
-
 ![Rocky walking with the scripted wave gait](docs/gait_wave.gif)
 
 *The analytic wave gait it was taught from, open loop. One foot swings at a
 time, in the order 0 → 2 → 4 → 1 → 3.*
+
+Other clips, all in `docs/`: the diffusion policy from a
+[parked start](docs/rocky_policy.mp4) and [walking in](docs/rocky_policy_full.mp4),
+the [blind pipeline with every stage scripted](docs/rocky_blind.mp4), and the
+[sighted version](docs/rocky_stack.mp4) from before the cameras came off.
 
 ## Quick start
 
@@ -245,6 +256,7 @@ across the front listening through its own open hand, and locates both cubes to
 confirmed by the touch pads, which is a blind robot's only way of knowing it
 actually picked anything up, and on a miss it feels around and tries again.
 
+The clip at the top of this README is that sweep and the pick that follows it.
 [docs/blind.md](docs/blind.md) has the sensor design, the three estimator bugs
 that each cost an episode to find, and the measured accuracy.
 
