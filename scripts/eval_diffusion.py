@@ -123,14 +123,14 @@ def episode(args, rng, runner, film_path=None):
     """One episode; `film_path` records it, otherwise it runs headless."""
     sc = Scene()
     red, blue = layout(rng, args)
-    b = Blind(sc)
+    b = Blind(sc, locomotion=args.locomotion)
     film = None if film_path is None else Film(sc.m, film_path, args.fps,
                                                args.width, args.height)
 
     if args.walk_in:
         # The whole thing: find the cubes, walk to them, brace, feel, then hand
-        # over. The locomotion here is the analytic gait -- the trained walking
-        # policy plugs into the same twist, it just is not in this container.
+        # over. --locomotion swaps the analytic gait for the trained PPO policy;
+        # both consume the twist `rocky.approach` emits.
         base_xy, yaw = spawn_pose(rng, (np.array(red) + np.array(blue)) / 2.0)
         seed, start, timeout = None, "listen", args.walk_timeout
     else:
@@ -224,6 +224,8 @@ def main() -> int:
     ap.add_argument("--walk-in", action="store_true",
                     help="run the whole thing: search, approach, feel, then the policy")
     ap.add_argument("--walk-timeout", type=float, default=110.0)
+    ap.add_argument("--locomotion", default=None,
+                    help="rsl-rl checkpoint to walk with; omit for the analytic gait")
     ap.add_argument("--torch-seed", type=int, default=0,
                     help="the sampler draws noise; fix it so a good episode can be re-filmed")
     ap.add_argument("--wide", action="store_true")

@@ -14,7 +14,9 @@ manipulation stack that walks up to two cubes and stacks one on the other.
 0.15 rad/s (right). Full clips: [forward](docs/rocky_walk_forward.mp4),
 [turning](docs/rocky_turn_in_place.mp4).*
 
-*The diffusion policy driving, blind: [docs/rocky_policy.mp4](docs/rocky_policy.mp4).
+*Everything learned except perception — PPO walking in, diffusion policy stacking:
+[docs/rocky_end_to_end.mp4](docs/rocky_end_to_end.mp4). The diffusion policy alone:
+[docs/rocky_policy.mp4](docs/rocky_policy.mp4).
 Walking up to two cubes and stacking the red one on the blue:
 [docs/rocky_stack.mp4](docs/rocky_stack.mp4). The locomotion controller parks the
 robot, then hands over to the arm.*
@@ -224,6 +226,11 @@ What the robot has instead: 270 rangefinders standing in for the sonar, five mor
 fanning out from the gripper, two touch pads, the joint encoders and an IMU. **11
 of 14 episodes stacked** on that alone — nothing in the pipeline reads a cube's
 true pose.
+
+Pass `--locomotion <checkpoint>` and the PPO policy does the walking instead of
+the analytic gait; both take the same twist. `src/rocky/locomotion.py` runs an
+rsl-rl checkpoint in plain MuJoCo with no mjlab, CUDA or Warp — useful well
+beyond this demo, since it is how the policy would be deployed.
 
 The emitters live in the five **gaps between the limbs**, because a limb blocks
 about 12° either side of its own azimuth and no mounting changes that. Which

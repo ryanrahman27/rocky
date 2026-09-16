@@ -46,6 +46,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from rocky import arm, model_params as P                         # noqa: E402
 from rocky.approach import Approach, ApproachParams, spawn_pose   # noqa: E402
 from rocky.gait import WaveGait                                   # noqa: E402
+from rocky.locomotion import PolicyWalker                         # noqa: E402
 from rocky.kinematics import limb_points                          # noqa: E402
 from rocky.sonar import Sonar, PairTracker, _cluster, observation  # noqa: E402
 from rocky.stack import StackController, StackPlan                # noqa: E402
@@ -113,11 +114,15 @@ class Blind:
     """The state machine. Egocentric throughout: no world frame anywhere."""
 
     def __init__(self, scene: Scene, plan: StackPlan | None = None, retries: int = 2,
-                 noise: float = 0.0, rng=None):
+                 noise: float = 0.0, rng=None, locomotion=None):
         self.sc = scene
         self.sonar = Sonar(scene.m)
         self.track = PairTracker(self.sonar)
         self.gait = WaveGait()
+        #: The trained PPO policy, if one was supplied, else the analytic gait.
+        #: Both consume the same twist, which is the whole point of `approach`
+        #: producing one rather than joint angles.
+        self.walker = None if locomotion is None else PolicyWalker(locomotion, scene.m)
         self.appr = Approach(ApproachParams(), self.gait)
         self.stack = StackController(plan or StackPlan())
         self.retries = retries
@@ -138,6 +143,14 @@ class Blind:
         d = self.sc.d
         return float(d.sensordata[self.gyro + 2]), d.sensordata[self.vel:self.vel + 2].copy()
 
+    def locomote(self, t: float, vx: float, vy: float, wz: float) -> dict[str, float]:
+        """Joint targets for the walking half, from whichever controller is in charge."""
+        if self.walker is None:
+            return gait_joints(self.gait, t, vx, vy, wz)
+        joints = self.walker.step(self.sc.d, (vx, vy, wz))
+        joints["jaw_r"] = joints["jaw_l"] = arm.JAW_OPEN
+        return joints
+
     def limbs(self):
         """Where the robot's own knees and feet are, from its joint encoders."""
         d, qa = self.sc.d, self.sc.qadr
@@ -150,12 +163,16 @@ class Blind:
         sc, d = self.sc, self.sc.d
         t, dt = 0.0, sc.dt
         n_ctrl = max(1, int(round(1.0 / (CONTROL_HZ * dt))))
-        n_sens = max(1, int(round(1.0 / (SONAR_HZ * dt))))
+        # The locomotion policy reads the IMU every control tick, so the
+        # sensor stage cannot be skipped while it is driving.
+        n_sens = n_ctrl if self.walker is not None else max(1, int(round(1.0 / (SONAR_HZ * dt))))
         sensor_bit = int(mujoco.mjtDisableBit.mjDSBL_SENSOR)
         joints = gait_joints(self.gait, 0.0, 0.0, 0.0, 0.0)
         tick = 0
         phase, t_phase = start_phase, 0.0
         self.track.reset()
+        if self.walker is not None:
+            self.walker.reset()
         pair = None
         self.parked = _lone_pair((0.36, 0.0)) if seed_pair is None else seed_pair
         self.lone = None
@@ -209,7 +226,7 @@ class Blind:
                     # across whatever is out there.
                     wz_cmd = 0.25 * math.sin(2.0 * math.pi * t / SEARCH_PERIOD)
                     vx_cmd = 0.05
-                joints = gait_joints(self.gait, t, vx_cmd, 0.0, wz_cmd)
+                joints = self.locomote(t, vx_cmd, 0.0, wz_cmd)
                 if pair is not None and pair.separation > 0.06:
                     self.appr.reset()
                     phase, t_phase = "walk", t
@@ -233,17 +250,17 @@ class Blind:
                     target = self.lone
                     axis = np.array([-target[1], target[0]])   # face it squarely
                 if target is None:
-                    joints = gait_joints(self.gait, t, 0.0, 0.0, 0.25)
+                    joints = self.locomote(t, 0.0, 0.0, 0.25)
                 else:
                     r = float(np.hypot(*target))
                     crab = None if r > self.appr.p.square_up_range else 0.0
                     tw = self.appr.command_body(t, target, axis, crab)
-                    joints = gait_joints(self.gait, t, tw.vx, tw.vy, tw.wz)
+                    joints = self.locomote(t, tw.vx, tw.vy, tw.wz)
                     if tw.arrived:
                         self.parked = pair if pair is not None else _lone_pair(target)
                         phase, t_phase = "settle", t
             elif phase == "settle":
-                joints = gait_joints(self.gait, t_phase, 0.0, 0.0, 0.0)
+                joints = self.locomote(t, 0.0, 0.0, 0.0)
                 if t - t_phase > 0.8:
                     held = pair if pair is not None else self.parked
                     # In the body frame the floor is not at z = 0, it is a ride
@@ -379,6 +396,8 @@ def main() -> int:
     ap.add_argument("--shard", type=int, default=0)
     ap.add_argument("--shards", type=int, default=1)
     ap.add_argument("--wide", action="store_true", help="randomise past the success envelope")
+    ap.add_argument("--locomotion", default=None,
+                    help="rsl-rl checkpoint to walk with; omit for the analytic gait")
     ap.add_argument("--timeout", type=float, default=110.0)
     ap.add_argument("--cubes", type=float, nargs=4, default=None)
     ap.add_argument("--start", type=float, nargs=3, default=None)
@@ -400,11 +419,14 @@ def main() -> int:
         else:
             base_xy, yaw = spawn_pose(rng, (red + blue) / 2.0)
         b = Blind(sc, retries=args.retries, noise=args.noise,
-                  rng=np.random.default_rng(args.seed * 1000 + ep))
+                  rng=np.random.default_rng(args.seed * 1000 + ep),
+                  locomotion=args.locomotion)
         sc.reset(b.gait.neutral_joint_targets(), base_xy, yaw, red, blue)
         for _ in range(300):
             sc.apply(gait_joints(b.gait, 0.0, 0.0, 0.0, 0.0))
             mujoco.mj_step(sc.m, sc.d)
+        if b.walker is not None:
+            b.walker.reset()
 
         renderer = None
         if args.video and ep == 0:

@@ -197,6 +197,70 @@ scripted, because it is a sensing routine rather than a skill; the policy
 replaces the fifteen seconds after it, on a receding horizon that executes four
 steps of each predicted chunk and re-plans.
 
+## Walking with the trained policy
+
+`--locomotion <checkpoint>` swaps the analytic wave gait for the PPO policy, in
+both `blind_stack_demo.py` and `eval_diffusion.py`. Both controllers consume the
+twist `rocky.approach` emits, which is why this is a one-argument change rather
+than a rewrite.
+
+`src/rocky/locomotion.py` runs that checkpoint without mjlab: an rsl-rl actor is
+an observation normaliser and a four-layer ELU MLP, and the observation can be
+rebuilt out of ordinary MjData. Every field was read from the task config rather
+than inferred, because a vector assembled in the wrong order gives a robot that
+thrashes — obvious — and one assembled in the right order with the wrong scale
+gives a robot that walks *badly*, which is not.
+
+| slice | term | source |
+|---|---|---|
+| 0:3 | base linear velocity | velocimeter at the imu site |
+| 3:6 | base angular velocity | gyro at the imu site |
+| 6:9 | projected gravity | −(world up, in the base frame) |
+| 9:25 | joint position − default | encoders |
+| 25:41 | joint velocity | encoders |
+| 41:57 | previous raw action | held by the runner |
+| 57:60 | commanded twist | whatever is driving |
+| 60:62 | gait clock | (sin, cos) of 2π·t/2.4 |
+
+Action is a per-joint offset from the default stance, scaled 0.25 for sweep, 0.4
+for lift and elbow, 0.3 for the wrist; control runs at 50 Hz (decimation 4 on a
+5 ms step). The clock counts control steps, so the runner is stateful and has to
+be reset per episode.
+
+Two things this exposed. The joints must be selected **by name**:
+`rocky_manip.xml` inserts the two jaw joints straight after `wrist_0`, so a slice
+would shift every leg from 1 onwards by two. And the sensor stage cannot be
+decimated while the policy is driving — the demo skips it to 20 Hz for the sonar,
+which would feed the policy a stale IMU on three control ticks in five.
+
+Checked in plain MuJoCo against the numbers this checkpoint was measured at in
+mjlab, 16 s per command:
+
+| command | here | mjlab eval |
+|---|---|---|
+| 0.02 m/s | 0.023 | 0.021 |
+| 0.04 m/s | 0.058 | 0.047 |
+| 0.06 m/s | 0.083 | 0.072 |
+| 0.08 m/s | 0.099 | 0.082 |
+| −0.04 m/s | −0.057 | −0.055 |
+| 0.15 rad/s | 0.147 | 0.121 |
+| 0.30 rad/s | 0.215 | 0.149 |
+
+Same shape, consistently 10–40% faster, which is what you would expect: the mjlab
+evaluation runs with the play-time randomisation still on — friction, base centre
+of mass, ±15 mrad of encoder bias — and this is the nominal model.
+
+The 0.30 rad/s row first came out at **−0.18**, the wrong way round. That was the
+measurement, not the policy: 0.3 rad/s for 16 s is 4.8 rad, and differencing two
+`atan2` yaws wraps it into a negative angle. Accumulating per step fixes it.
+
+### End to end
+
+Ten episodes with the PPO policy walking and the diffusion policy manipulating:
+**9 of 10 reached the cubes**, and 6 of those 10 ended with the red cube on top —
+the same rate as starting the robot already parked, so the learned walk-up costs
+the manipulation nothing. With the scripted arm instead, 8 of 10 stacked.
+
 ### Results
 
 320 episodes generated across two workers, randomised wider than the success
